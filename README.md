@@ -6,7 +6,7 @@ drops the ones that can never fit you, scores the rest from 1 to 10 against your
 reasons, and writes a tailored CV, cover letter and interview prep for the jobs you pick. You stay in
 control: nothing is ever sent for you.
 
-**Live demo:** _link coming soon_ (the showcase and a clickable demo with invented data)
+**Live demo:** _link coming soon_ (to deploy your own: import the repo in Vercel with Root Directory `web`) (the showcase and a clickable demo with invented data)
 
 ![The Job2go showcase](docs/showcase.png)
 
