@@ -1,0 +1,84 @@
+# ------------------------------------------------------------
+# Your master profile. Copy this file to profile.yaml and replace everything with your own facts.
+# The AI judges every job against it and builds your tailored CVs ONLY from what is here,
+# so keep it true: anything here can come up in an interview.
+# (This example person is invented.)
+# ------------------------------------------------------------
+
+name: Alex Duarte
+location: Lisbon, Portugal
+headline: Customer Operations | Client Onboarding | Data-minded
+
+# Used exactly like this on every CV
+contact:
+  phone: "+351 000 000 000"
+  email: you@example.com
+  linkedin: linkedin.com/in/your-name
+  portfolio: your-site.example.com
+
+summary: |
+  Customer operations professional with almost five years in B2B onboarding, account care and
+  sales support. Comfortable with the data behind the work (SQL, Sheets). Works in Portuguese,
+  English and Spanish.
+
+languages:
+  - Portuguese (native)
+  - English (C1)
+  - Spanish (B2)
+
+education:
+  - degree: MSc Management (Marketing and Operations)
+    school: Example School of Management, Lisbon
+    year: 2020
+  - degree: BSc Business Administration
+    school: Example University, Lisbon
+    year: 2018
+
+projects:
+  - name: Onboarding health dashboard
+    type: Personal project
+    dates: "2025"
+    highlights:
+      - Built a Looker Studio dashboard on public sample data that tracks onboarding steps, delays and early churn signals.
+    angles:  # other wordings of the SAME facts; the AI picks the one that fits each job
+      data: "Built an onboarding dashboard in Looker Studio from public sample data."
+      customer_success: "Tracked onboarding steps and early churn signals in a dashboard I built."
+
+experience:
+  - role: Client Onboarding & Operations Coordinator
+    company: Example Logistics, Lisbon
+    dates: Mar 2023 - Dec 2025
+    highlights:
+      - Ran onboarding for 45 B2B clients a year, cutting average time-to-go-live from 6 to 4 weeks.
+      - Built a weekly SQL and Google Sheets report on shipment delays used by the operations lead.
+    angles:
+      onboarding: "Took 45 B2B clients a year from kickoff call to first live shipment."
+      operations: "Redesigned the hand-off between sales and operations, halving hand-off errors."
+  - role: Customer Success Associate
+    company: Example Retail, Lisbon
+    dates: Jun 2021 - Feb 2023
+    highlights:
+      - Handled 60+ customer conversations a day in three languages, keeping CSAT at 94%.
+    angles:
+      support: "Answered customers by chat, email and phone in Portuguese, English and Spanish."
+
+skills:
+  customer_success: [Client onboarding, Account management, Renewals]
+  operations: [Process mapping, Project coordination]
+  data: [SQL (intermediate), Google Sheets and Excel (advanced), Looker Studio]
+
+# Every tool you know, by category. A CV never shows this whole list: only the tools a job asks for.
+tools_inventory:
+  crm_and_support: [HubSpot, Salesforce, Zendesk]
+  work_management: [Jira, Asana, Notion, Slack]
+  office_and_data: [Google Workspace, Microsoft 365, Looker Studio, Power BI]
+
+# What you are looking for - the AI uses this to judge fit
+what_i_want: |
+  Junior to mid-level roles in customer success, onboarding, operations or account management.
+  In my city, or remote.
+
+# Things that make a job a bad fit
+deal_breakers: |
+  - Senior roles asking for 5+ years in the exact role.
+  - Commission-only sales.

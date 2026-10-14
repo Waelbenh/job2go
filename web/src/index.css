@@ -1,0 +1,153 @@
+/* Job2go AI — design tokens. Every value here comes from DESIGN.md.
+   Tailwind turns the @theme values into classes: bg-charcoal-850, text-go-400, rounded-l, font-display ... */
+@import 'tailwindcss';
+@import '@fontsource-variable/archivo/standard.css'; /* includes the wide (expanded) letters */
+@import '@fontsource-variable/hanken-grotesk';
+@import '@fontsource-variable/martian-mono/standard.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  /* ---------- Fonts ---------- */
+  --font-display: 'Archivo Variable', 'Arial Narrow', sans-serif;
+  --font-sans: 'Hanken Grotesk Variable', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'Martian Mono Variable', ui-monospace, Menlo, monospace;
+
+  /* ---------- Type scale (size / line-height) ---------- */
+  --text-display-xl: 4.5rem;  --text-display-xl--line-height: 1;     --text-display-xl--letter-spacing: -0.02em;
+  --text-display-l: 3rem;     --text-display-l--line-height: 1.05;   --text-display-l--letter-spacing: -0.015em;
+  --text-display-m: 1.875rem; --text-display-m--line-height: 1.15;   --text-display-m--letter-spacing: -0.01em;
+  --text-title: 1.25rem;      --text-title--line-height: 1.3;
+  --text-body-l: 1.125rem;    --text-body-l--line-height: 1.6;
+  --text-body: 0.9375rem;     --text-body--line-height: 1.55;
+  --text-small: 0.8125rem;    --text-small--line-height: 1.45;
+  --text-num-xl: 3.5rem;      --text-num-xl--line-height: 1;
+  --text-num: 0.875rem;       --text-num--line-height: 1;
+
+  /* ---------- Colors ---------- */
+  --color-charcoal-950: #141518;
+  --color-charcoal-900: #1a1b1f; /* page background */
+  --color-charcoal-850: #202126; /* surfaces */
+  --color-charcoal-800: #272930; /* raised, hover, inputs */
+  --color-charcoal-700: #33363e; /* visible borders, active tab */
+  --color-hairline: rgb(255 255 255 / 0.07);
+  --color-ink: #ecebe7;          /* main text */
+  --color-ink-muted: #a2a4ab;
+  --color-ink-faint: #6c6f78;    /* placeholders + disabled ONLY (3.4:1) */
+
+  --color-go-400: #6bd78a; /* green text */
+  --color-go-500: #43c46a; /* THE accent */
+  --color-go-900: #173523; /* green fills */
+  --color-go-glow: rgb(67 196 106 / 0.35);
+
+  --color-score-great: #43c46a; /* 8-10 */
+  --color-score-good: #6aa6ff;  /* 7, links */
+  --color-score-maybe: #e3b24f; /* 5-6 */
+  --color-score-low: #ee6b5f;   /* below 5, risks */
+
+  /* ---------- Depth ---------- */
+  --shadow-depth-1: inset 0 1px 0 rgb(255 255 255 / 0.04), 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-depth-2: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 12px 32px -12px rgb(0 0 0 / 0.6);
+  --shadow-depth-3: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 40px 80px -24px rgb(0 0 0 / 0.75);
+  --shadow-glow-go: 0 0 0 1px rgb(67 196 106 / 0.45), 0 0 28px var(--color-go-glow);
+
+  /* ---------- Motion ---------- */
+  --ease-go: cubic-bezier(0.16, 1, 0.3, 1);
+  --default-transition-duration: 120ms;
+  --default-transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* shadcn/ui components read these names. They point at our tokens, so shadcn matches the design. */
+:root {
+  --background: var(--color-charcoal-900);
+  --foreground: var(--color-ink);
+  --card: var(--color-charcoal-850);
+  --card-foreground: var(--color-ink);
+  --popover: var(--color-charcoal-800);
+  --popover-foreground: var(--color-ink);
+  --primary: var(--color-go-500);
+  --primary-foreground: var(--color-charcoal-950);
+  --secondary: var(--color-charcoal-800);
+  --secondary-foreground: var(--color-ink);
+  --muted: var(--color-charcoal-800);
+  --muted-foreground: var(--color-ink-muted);
+  --accent: var(--color-charcoal-800);
+  --accent-foreground: var(--color-ink);
+  --destructive: var(--color-score-low);
+  --border: var(--color-hairline);
+  --input: var(--color-charcoal-700);
+  --ring: var(--color-go-500);
+  --radius: 10px;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  /* Corner radius, bigger object = rounder (DESIGN.md xs/s/m/l):
+     rounded-sm 6 tags/inputs · rounded-md 10 buttons/rows · rounded-lg 16 panels · rounded-xl 24 hero window/modals */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+
+@layer base {
+  * { @apply border-border; }
+  html { -webkit-text-size-adjust: 100%; }
+  /* Links to a part of the page glide there (not with reduced motion) */
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
+  body {
+    @apply font-sans text-body text-ink antialiased;
+    /* Layered background, layer 1: a slow fall-off downward */
+    background: linear-gradient(180deg, #1d1e23 0%, #1a1b1f 40%, #17181b 100%) fixed, #1a1b1f;
+    min-height: 100dvh;
+  }
+  /* Layer 3: a light grain over everything, so big dark areas don't look flat */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  :focus-visible { outline: 2px solid var(--color-go-500); outline-offset: 2px; }
+  ::selection { background: var(--color-go-900); color: var(--color-go-400); }
+}
+
+/* Reusable pieces that are easier to read as CSS than as long class lists */
+@utility font-wide {
+  /* Archivo's expanded width: the signage look of our titles */
+  font-family: var(--font-display);
+  font-stretch: 118%;
+}
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+@utility glass {
+  /* The floating top bar (learned from Raycast) */
+  background: rgb(32 33 38 / 0.72);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: inset 0 0 0 1px var(--color-hairline), var(--shadow-depth-2);
+}

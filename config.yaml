@@ -1,0 +1,676 @@
+# ============================================================
+# Job2go settings - an EXAMPLE for an invented person in Lisbon (see profile.example.yaml).
+# Change the "home" block, the searches, the languages and the places below to yours.
+# Lines starting with # are comments. Every number is explained next to it.
+# ============================================================
+
+# Which AI model scores the jobs (Gemini API, free tier works).
+model: gemini-3.5-flash-lite
+
+# WHERE YOU LIVE AND STUDY. The AI's location tiers ("Lisbon city", "Lisbon metro area",
+# "Outside Lisbon province", "Remote - hires in Portugal" ...), the report's tags, the CV contact
+# line and the letter's date and closing are all made from these values (agent/home.py).
+home:
+  city: Lisbon
+  country: Portugal
+  contract_adjective: Portuguese        # "Portuguese contract" = employed by a company in your country
+  also_remote_from: []                  # other countries whose remote jobs you can take
+  city_local: {en: Lisbon, es: Lisboa, fr: Lisbonne}                  # your city, per CV language
+  city_full: {en: "Lisbon, Portugal", es: "Lisboa, Portugal", fr: "Lisbonne, Portugal"}
+  city_words: "lisbon|lisboa|lisbonne"                                # how a letter may name it
+  metro_examples: "Oeiras, Amadora, Almada, Odivelas, Loures..."
+  province_examples: "Sintra, Cascais, Mafra, Setubal, Barreiro"
+  outside_examples: "Porto, Coimbra, Madrid, abroad..."
+  university:                           # always written the same way on CVs (name "" = no rule)
+    name: ""
+    short: ""
+    variants: []
+
+# QUALITY OVER QUANTITY — how the report is sorted (scores are 1-10).
+# Score good_match_min or more  -> "Good matches" (shown first).
+# Score min_score up to just below good_match_min -> "Maybe" (folded away in the report).
+# Score below min_score -> hidden from the report, but kept in data/jobs.csv.
+good_match_min: 7
+min_score: 6
+
+# The report opens with this many Good matches; the rest are behind a "Show more" button.
+report_top_n: 15
+
+# "New today" box at the very top of the report: jobs found in THIS run with at least
+# this score, Trusted first, then by score. They get a "NEW" label and are not repeated
+# in Good matches below.
+new_today_min_score: 7
+
+# Inside Good matches, jobs are sorted by trust first, in this order, then by score.
+# A job with no trust label counts like "Check".
+trust_order: [Trusted, Check, Suspicious]
+
+# ------------------------------------------------------------
+# SCORING RULES — how each job's final score (1-10) is made. Change the numbers any time.
+#   Step 1: the AI gives a FIT score (1-10) for the must-haves only: core skills and
+#           experience, seniority and languages. Tasks normally taught on the job in an
+#           entry/junior role (setting up a platform, QA testing, a new domain or tool) go
+#           under "To learn" and do NOT lower it. The AI also picks fixed choices
+#           (seniority, role type, required languages, location...) that the code uses below.
+#   Step 2: the code (scoring.apply_rules) adds the boosts, subtracts the penalties and
+#           applies the caps below. The report shows "Fit 6 -> final 8 (...)" when they changed it.
+# Missing information (pay, contract type, work mode, a cut-off text) NEVER lowers a score:
+# it is listed under "Unknown" in the report.
+# ------------------------------------------------------------
+scoring_rules:
+  # BOOSTS (+ points). Only given when the AI's fit score is at least boost_min_fit,
+  # so an unrelated job (e.g. a physiotherapist job in Lisbon) is never pushed up.
+  # Result: a good English-only job (fit 6) = 7, a good job that wants Portuguese = 8-9.
+  boost_min_fit: 4
+  boosts:
+    language: 2               # the job REQUIRES or PREFERS a language from boost_languages
+    location: 1               # the job's location tier is in boost_location_tiers
+    entry_level: 1            # the job's seniority is in entry_levels
+    role_type: 1              # the job's role type is in boost_role_types
+  max_other_boost: 1          # location + entry_level + role_type together add at most this
+  # Allowed values: English, French, Arabic, "Spanish (B2 or lower)", "Spanish (C1 / native)",
+  # German, Italian, Portuguese, Dutch, Other.
+  boost_languages: [Portuguese]       # your rare languages: the language boost
+  # Languages you have: no boost, no penalty. A REQUIRED language NOT in this list is a red flag.
+  my_languages: [English, Portuguese, "Spanish (B2 or lower)"]
+  boost_location_tiers: ["Lisbon city", "Remote - hires in Portugal", "Remote - worldwide"]
+  # Allowed values: Internship, "Entry / Junior / Associate", Mid-level, "Senior (5+ years)", Not stated
+  entry_levels: ["Entry / Junior / Associate"]
+  # Allowed values: "Customer success / account management", "Customer-facing / support",
+  # Operations, Sales, "Business / product / data analysis", "Marketing / content",
+  # "Engineering / IT", Other
+  boost_role_types: ["Customer success / account management", "Customer-facing / support",
+                     Operations, Sales]
+
+  # PENALTIES (minus points)
+  penalties:
+    metro_area: 1             # Oeiras, Amadora... (not applied if hybrid or flexible hours)
+    province: 2               # towns up to about 70 km / 1 hour away (Sintra, Setubal...)
+    unpaid: 3
+    commission_only: 3
+
+  # CAPS = real red flags: the final score can never be higher than this number.
+  caps:
+    language_i_dont_have: 3          # a REQUIRED language not in my_languages (German, C1/native Spanish...)
+    senior_5_plus_years: 4           # senior role asking for 5+ years
+    onsite_outside_home: 4           # on-site or hybrid, farther than about 1 hour from home
+    remote_other_countries_only: 3   # remote, but only for people in other countries (e.g. "US only")
+    suspicious_posting: 2            # scam / MLM signs, asks you to pay upfront fees
+
+  # Examples the AI reads before scoring, so its scores stay consistent.
+  # final = the correct score after the rules above; fit = what the AI should give in step 1.
+  calibration_examples:
+    - job: Customer success associate at a software company, hybrid in Lisbon, entry level, English and
+        Portuguese required, wants interest in AI tools
+      fit: 6
+      final: 9
+      reason: Core profile fits (languages, client-facing, interest in AI); setting up their platform is
+        learnable on the job, so it goes under To learn, not gaps.
+    - job: English-only, entry-level customer success job in Lisbon
+      fit: 6
+      final: 7
+      reason: Good fit; English is expected (no language boost), +1 for Lisbon / entry level / customer success.
+    - job: Any role that requires a language the candidate does not have (e.g. native German)
+      fit: as usual
+      final: 3
+      reason: A required language the candidate does not have - the code caps it at 3.
+    - job: Outbound cold-calling SDR, on-site in Porto
+      fit: 5
+      final: 4
+      reason: Sales is a related, junior-friendly role, but it is on-site far from Lisbon (capped at 4).
+    - job: Unrelated profession (physiotherapist, teacher, construction site manager)
+      fit: 1
+      final: 1
+      reason: Different profession - no transferable core skills.
+
+# Duplicates: the same job found more than once (same city, very similar title,
+# posted within days_apart days of each other). Only one is kept.
+# The direct employer is preferred over an agency / job-board repost, then the longer description.
+duplicates:
+  enabled: true
+  days_apart: 7
+  title_similarity: 0.94    # 1.0 = identical titles; below ~0.9 starts merging different roles
+  # A company name containing one of these words counts as an agency or job-board repost.
+  agency_words: [randstad, adecco, manpower, "page personnel", "michael page", hays, kelly,
+                 synergie, "gi group", "team labor", "grupo eurofirms", recruitment, recruiting,
+                 staffing, headhunter, "selección", "seleccion", "ett",
+                 jobgether, jooble, adzuna, jobrapido, lensa, "talent.com", learn4good]
+
+# ------------------------------------------------------------
+# AI MODELS — only Gemini (API key) and Claude (Claude Code CLI, your Claude Pro plan).
+# APPLICATION PACKS (python tailor.py): Claude first, then tailoring_model, then gemini_backup_model.
+# JOB SCORING (python run.py): model, then gemini_backup_model, then Claude in batches of 10.
+# ------------------------------------------------------------
+
+# Gemini model that writes the application packs if Claude fails.
+# Separate from "model" above, so it has its own daily quota.
+tailoring_model: gemini-3.8-flash
+
+# Second Gemini model, used when the first one cannot answer (packs AND scoring). It has its
+# OWN quota (it must differ from "model" and "tailoring_model"). Checked 2026-10-12.
+gemini_backup_model: gemini-3.5-flash
+
+# Claude: true = use it, false = switch it off (packs and scoring).
+# "sonnet" / "haiku" always mean the newest Claude model of that kind.
+use_claude: true
+claude_pack_model: sonnet       # writes the application packs (tried FIRST)
+claude_scoring_model: haiku     # scores jobs Gemini could not (10 per request)
+# Max jobs Claude scores per day. Jobs neither Gemini nor Claude could score stay
+# unscored and are tried again on the next run.
+claude_scoring_daily_cap: 150
+
+# Speed settings for every AI answer:
+ai_timeout_seconds: 45          # Gemini: give up on one answer after this many seconds
+claude_timeout_seconds: 150     # Claude writes a whole pack in one answer, so it needs longer
+ai_tries_per_model: 2           # tries per model before moving on to the next one
+ai_retry_wait_seconds: 5        # short pause between two tries of the same model
+gemini_busy_limit: 3            # Gemini says "busy" (503) this many times in a row -> skip it
+                                # for the rest of the run and go straight to Claude
+# When Gemini says a model's DAILY limit is used up, that model is skipped until tomorrow
+# (remembered in data/gemini_quota.json) - no waiting and retrying.
+
+# How many results to ask for per search (per job site).
+results_per_search: 15
+
+# FRESHNESS: only jobs posted in the last N days. Used by every source:
+# Indeed/LinkedIn (as hours), the remote boards, and the InfoJobs alert emails.
+max_age_days: 7
+# (Jobs already in data/jobs.csv from earlier runs are always skipped, whatever this number is.)
+
+# LinkedIn: open each job's page during the search to get its description (true = on).
+# LinkedIn often blocks some of these fast requests, so a few jobs arrive without text.
+# Before scoring, agent/fulltext.py fetches those again, slowly (2-3 seconds apart).
+linkedin_fetch_description: true
+
+# Which job sites to search. Options: indeed, linkedin, glassdoor
+# (Google Jobs has its own switch further down: google_jobs)
+sites: [indeed, linkedin]
+
+# Each search below runs on every site listed above.
+#   term     = what you'd type in the job site's search box
+#   location = city or country
+#   remote   = true to only get remote jobs
+searches:
+  # Your city - priority 1
+  - term: customer success
+    location: Lisbon, Portugal
+  - term: operations coordinator
+    location: Lisbon, Portugal
+  - term: business analyst
+    location: Lisbon, Portugal
+  - term: client onboarding
+    location: Lisbon, Portugal
+  # Remote - priority 2
+  - term: customer success
+    location: Portugal
+    remote: true
+  - term: operations analyst
+    location: Portugal
+    remote: true
+
+# ------------------------------------------------------------
+# Freelance / contract searches (on the same sites as above).
+# Every term runs once for each location below.
+# job_type "contract" filters Indeed to contract jobs. LinkedIn
+# ignores this filter, so there the search words do the work.
+# ------------------------------------------------------------
+freelance_searches:
+  job_type: contract
+  terms:
+    - freelance
+    - contractor
+    - freelance customer success
+    - freelance business analyst
+  locations:
+    - location: Portugal
+    - location: Portugal
+      remote: true
+
+# ------------------------------------------------------------
+# Google Jobs: true = on, false = off.
+# It searches every term from "searches" above, using this sentence
+# ({term} is replaced by the search term). If Google blocks it or
+# finds nothing, it is skipped and the run continues.
+# ------------------------------------------------------------
+google_jobs: false
+google_search_template: "{term} jobs in Lisbon, Portugal since yesterday"
+
+# Country used by Indeed / Glassdoor.
+country: Portugal
+
+# ------------------------------------------------------------
+# Remote job boards (free public feeds). true = on, false = off.
+# Their terms: we link back to each job on their site and name
+# them as the source. The agent also waits between checks
+# (Remotive: 6h, Himalayas: 12h, the others: 1h).
+# ------------------------------------------------------------
+remote_sources:
+  remotive: true
+  remoteok: true
+  himalayas: true
+  weworkremotely: true
+
+# InfoJobs alert emails: read from Gmail (read-only, needs GMAIL_ADDRESS and
+# GMAIL_APP_PASSWORD in .env). true = on, false = off.
+infojobs_email: false
+
+# A remote job is kept only if its TITLE contains one of these words...
+remote_role_keywords:
+  - customer success
+  - customer experience
+  - customer support
+  - client success
+  - onboarding
+  - business analyst
+  - operations analyst
+  - operations specialist
+  - operations coordinator
+  - product owner
+  - product manager
+  - product operations
+  - product analyst
+  - service design
+  - automation
+  - AI specialist
+  - AI operations
+  - n8n
+  - no-code
+  - Portuguese
+  - multilingual
+
+# ...and none of these (too senior or pure software engineering).
+# ("engineer" is NOT here on purpose, so titles like "Customer Success
+# Engineer" or "Solutions Engineer" are kept.)
+remote_exclude_words:
+  - developer
+  - senior
+  - sr
+  - staff
+  - principal
+  - director
+  - head of
+  - vp
+
+# ------------------------------------------------------------
+# Free pre-filter (prefilter.py) — runs BEFORE the AI scoring.
+# Jobs that match a rule get status "filtered" and are never sent to Gemini.
+# Matching ignores UPPER/lower case. Edit the lists below any time.
+# ------------------------------------------------------------
+prefilter:
+  # Accents never matter in the two lists below: "almacén" also finds "almacen", and the other way round.
+
+  # Rule A: NEVER-TITLES. Jobs whose title contains one of these words get status
+  # "irrelevant title" and are never scored. Whole words only ("cook" does not find "cookies").
+  # English, Spanish, Catalan and French. Words in allow_in_title win (e.g. "data warehouse").
+  never_titles:
+    title_words:
+      # physiotherapist
+      - physiotherapist
+      - physical therapist
+      - fisioterapeuta
+      - physiothérapeute
+      - kinésithérapeute
+      - kiné
+      # teacher
+      - teacher
+      - professor
+      - profesor
+      - profesora
+      - professora
+      - professeur
+      - professeure
+      - enseignant
+      - enseignante
+      - docente
+      - maestro
+      - maestra
+      - mestre
+      - mestra
+      # construction
+      - construction
+      - construcción
+      - construcció
+      - jefe de obra
+      - jefa de obra
+      - cap d'obra
+      - obra
+      - obras
+      - albañil
+      - chantier
+      - conducteur de travaux
+      # SAP / ERP consultant
+      - sap
+      - erp consultant
+      - consultor erp
+      - consultora erp
+      - consultor/a erp
+      - consultant erp
+      # nurse
+      - nurse
+      - enfermero
+      - enfermera
+      - infermer
+      - infermera
+      - infirmier
+      - infirmière
+      # doctor
+      - doctor
+      - médico
+      - médica
+      - metge
+      - metgessa
+      - médecin
+      # driver
+      - driver
+      - conductor
+      - conductora
+      - chófer
+      - xofer
+      - repartidor
+      - repartidora
+      - chauffeur
+      - livreur
+      # warehouse
+      - warehouse
+      - almacén
+      - mozo de almacén
+      - magatzem
+      - carretillero
+      - carretillera
+      - entrepôt
+      - magasinier
+      - magasinière
+      # cook
+      - cook
+      - cocinero
+      - cocinera
+      - ayudante de cocina
+      - cuiner
+      - cuinera
+      - cuisinier
+      - cuisinière
+      - chef de cuisine
+      # cleaner
+      - cleaner
+      - limpiador
+      - limpiadora
+      - personal de limpieza
+      - operario de limpieza
+      - operaria de limpieza
+      - netejador
+      - netejadora
+      - agent d'entretien
+      - femme de ménage
+      # shop assistant / retail
+      - shop assistant
+      - store associate
+      - retail associate
+      - retail store associate
+      - sales associate
+      - cashier
+      - dependiente
+      - dependienta
+      - dependenta
+      - cajero
+      - cajera
+      - caixer
+      - caixera
+      - vendeur
+      - vendeuse
+      - caissier
+      - caissière
+      # mechanic
+      - mechanic
+      - mecánico
+      - mecánica
+      - mecànic
+      - mecànica
+      - mécanicien
+      - mécanicienne
+      # electrician
+      - electrician
+      - electricista
+      - électricien
+      - électricienne
+    allow_in_title:
+      - data warehouse
+      - customer success
+      - product owner
+      - product manager
+
+  # Rule B: LOCATION. Keep your city / its area and fully remote jobs; drop other cities.
+  # Dropped jobs get status "wrong location" and are never scored. How a job is checked:
+  #   1. The location names a place in far_places          -> drop (unless clearly fully remote)
+  #   2. The location names a place in keep_places         -> keep (on-site, hybrid or remote)
+  #   3. The location only has words from unclear_places   -> keep (e.g. "Spain", "Remote")
+  #   4. A remote-board location ("Remote — ...")          -> keep only if it names one of
+  #      remote_ok_regions (or no region at all); "Remote — USA only" is dropped
+  #   5. Any other city or region (Barcelona, Madrid...)   -> keep only if CLEARLY fully remote:
+  #      the title or location has a remote_word and no hybrid_word, or the job site marked it
+  #      remote AND the description says full_remote_phrases. Otherwise drop.
+  location:
+    enabled: true
+    # Your city, its metro area and towns up to about 1 hour away.
+    keep_places:
+      - lisbon
+      - lisboa
+      - oeiras
+      - amadora
+      - almada
+      - odivelas
+      - loures
+      - cascais
+      - sintra
+      - setubal
+    # Places in your region that are too far. Checked BEFORE keep_places.
+    far_places:
+      - porto
+      - braga
+      - coimbra
+      - faro
+    # A location made ONLY of these words is "unclear" and kept.
+    unclear_places:
+      - portugal
+      - europe
+      - europa
+      - emea
+      - eu
+      - remote
+      - remoto
+      - en remoto
+      - not stated
+      - anywhere
+      - anywhere in the world
+      - worldwide
+    # A "Remote — ..." location is kept if it names one of these.
+    remote_ok_regions:
+      - portugal
+      - europe
+      - europa
+      - emea
+      - eu
+      - worldwide
+      - anywhere
+      - global
+      - international
+    remote_words:
+      - remote
+      - remoto
+      - remota
+      - en remoto
+      - teletrabajo
+      - teletreball
+      - télétravail
+      - work from home
+    hybrid_words:
+      - hybrid
+      - híbrido
+      - híbrida
+      - híbrid
+      - hybride
+      - presencial
+      - semipresencial
+      - on-site
+      - onsite
+      - on site
+      - sur site
+    full_remote_phrases:
+      - 100% remote
+      - 100% remoto
+      - 100% teletrabajo
+      - teletrabajo 100%
+      - remoto 100%
+      - 100% télétravail
+      - fully remote
+      - full remote
+      - full-remote
+      - totalmente remoto
+      - work from anywhere
+
+  # Rule 1: the job asks for native / C1 / C2 Spanish.
+  # A "level word" only counts when the NEAREST language word next to it
+  # (within max_distance characters) is Spanish. So "C1 English" is kept.
+  spanish:
+    max_distance: 40
+    level_words:
+      - nativo
+      - nativa
+      - native
+      - lengua materna
+      - mother tongue
+      - C1
+      - C2
+      - nivel alto
+      - bilingüe
+      - bilingue
+      - bilingual
+    # The Spanish level only filters when it is clearly REQUIRED. We look at the
+    # same sentence/bullet first, then at the section heading above it.
+    required_words:
+      - imprescindible
+      - requerido
+      - requerida
+      - requisito
+      - requisitos
+      - obligatorio
+      - necesario
+      - se requiere
+      - se necesita
+      - required
+      - requirement
+      - requirements
+      - must
+      - mandatory
+      - essential
+    optional_words:       # nice-to-have wording: never filter
+      - valorable
+      - se valorará
+      - se valorara
+      - valorable
+      - deseable
+      - suma
+      - plus
+      - a plus
+      - beneficial
+      - preferred
+      - preferable
+      - nice to have
+      - ideally
+      - bonus
+    required_sections:    # headings that mean "this list is mandatory"
+      - requisitos
+      - requisitos mínimos
+      - requirements
+      - what you bring
+      - what we are looking for
+      - qué buscamos
+      - que buscamos
+      - tu perfil
+      - your profile
+      - you have
+      - must have
+      - imprescindible
+    optional_sections:    # headings that mean "this list is optional"
+      - se valorará
+      - se valorara
+      - valorable
+      - deseable
+      - nice to have
+      - nice-to-have
+      - a plus
+      - bonus
+      - preferred
+      - beneficial
+      - plus points
+    # Bilingual with one of these regional languages + Spanish is NOT "native Spanish".
+    regional_words: [euskera, euskara, basque, catalán, catalan, català, valenciano, valencià, gallego, galego, galician]
+    spanish_words: [español, espanol, spanish, castellano]
+    other_language_words:
+      - english
+      - inglés
+      - ingles
+      - french
+      - francés
+      - frances
+      - français
+      - arabic
+      - árabe
+      - arabe
+      - german
+      - alemán
+      - aleman
+      - italian
+      - italiano
+      - portuguese
+      - portugués
+      - portugues
+      - catalan
+      - catalán
+      - valenciano
+      - valencià
+
+  # Rule 2: the job TITLE is an engineering / developer role.
+  # (Seniority is NOT filtered.) Words in allow_in_title win over title_words.
+  engineering:
+    title_words:
+      - engineer
+      - ingeniero
+      - ingeniera
+      - developer
+      - desarrollador
+      - desarrolladora
+      - programador
+      - programadora
+      - devops
+      - sre
+      - data scientist
+      - data engineer
+      - machine learning engineer
+      - architect
+      - arquitecto
+      - arquitecta
+      - qa
+      - tester
+      - full stack
+      - fullstack
+      - full-stack
+      - backend
+      - back-end
+      - back end
+      - frontend
+      - front-end
+      - front end
+    allow_in_title:
+      - sales engineer
+      - solutions engineer
+      - business developer
+      - business development
+      - pre-sales
+      - presales
+      - customer success
+      - prompt engineer
+      - business analyst
+      - ai process
+      - ai innovation
+      - delivery architect
+      - ai agent

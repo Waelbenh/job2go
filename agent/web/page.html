@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Job2go AI</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%233fb950'/%3E%3Cpath d='M12 20h14m-5-5 5 5-5 5' stroke='%230d1f12' stroke-width='3.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<!-- Inter font from Google Fonts; without internet the system font is used instead -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>{{CSS}}</style>
+</head>
+<body>
+
+<!-- ========== Top bar: logo, stats, search, buttons ========== -->
+<header class="topbar">
+  <a class="brand" href="#home" aria-label="Job2go AI home">
+    <svg class="logo" viewBox="0 0 40 40" aria-hidden="true">
+      <rect width="40" height="40" rx="10" fill="#3fb950"/>
+      <text x="6" y="25" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="800" fill="#0d1f12">J2G</text>
+      <path d="M27 31h8m-3-3 3 3-3 3" stroke="#0d1f12" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="brand-text"><b>Job2go AI</b><small>Your AI job assistant, ready to go</small></span>
+  </a>
+  <nav class="nav">
+    <a href="#home" data-page="home">Home</a>
+    <a href="#jobs" data-page="jobs">Jobs</a>
+  </nav>
+  <div class="stats" id="stats"></div>
+  <div class="top-actions">
+    <input id="search" type="search" placeholder="Search jobs, companies…" aria-label="Search jobs">
+    <button id="add-btn" class="btn server-only">+ Add job</button>
+    <button id="run-btn" class="btn primary server-only">Run search</button>
+  </div>
+</header>
+
+<!-- Live progress of "Run search" -->
+<section id="runbox" class="runbox" hidden>
+  <div class="run-head"><b id="run-title">Running…</b><span id="run-step" class="muted"></span>
+    <button id="run-close" class="btn small" hidden>Close</button></div>
+  <div class="bar"><span id="run-bar"></span></div>
+  <pre id="run-log"></pre>
+</section>
+
+<p class="server-note" hidden>Opened as a plain file: start <code>python serve.py</code> to use the buttons
+  (run a search, add jobs, make packs, mark as applied).</p>
+<div id="toast" class="toast" hidden></div>
+
+<main>
+  <!-- ========== Home ========== -->
+  <section id="page-home" class="page">
+    <div class="section-head"><h2>New today</h2><span class="muted" id="new-when"></span></div>
+    <div id="new-today" class="grid"></div>
+    <div class="dash">
+      <div class="card chart-card"><h3>Jobs per source</h3><div id="chart-sources"></div></div>
+      <div class="card chart-card"><h3>Score spread</h3><div id="chart-scores"></div></div>
+      <div class="card chart-card"><h3>Applications per week</h3><div id="chart-weeks"></div></div>
+      <div class="card chart-card"><h3>AI usage today</h3><div id="usage"></div></div>
+    </div>
+  </section>
+
+  <!-- ========== Jobs ========== -->
+  <section id="page-jobs" class="page" hidden>
+    <div class="tabs" id="tabs" role="tablist"></div>
+    <div class="filters">
+      <label>Score <select id="f-score">
+        <option value="0">Any</option><option value="6">6+</option><option value="7">7+</option><option value="8">8+</option>
+      </select></label>
+      <label>Source <select id="f-source"><option value="">All</option></select></label>
+      <label>Remote <select id="f-remote">
+        <option value="">Any</option><option value="yes">Remote only</option><option value="no">Not remote</option>
+      </select></label>
+      <label>Location <select id="f-location">
+        <option value="">Any</option><option>Valencia</option><option>Remote</option><option>Other</option><option>Unknown</option>
+      </select></label>
+      <button id="f-clear" class="btn small">Clear filters</button>
+    </div>
+    <div id="job-list" class="list"></div>
+  </section>
+</main>
+
+<!-- ========== Job detail side panel ========== -->
+<div id="overlay" class="overlay" hidden></div>
+<aside id="panel" class="panel" hidden aria-label="Job details">
+  <button class="close" id="panel-close" aria-label="Close">✕</button>
+  <div id="panel-body"></div>
+</aside>
+
+<!-- ========== Pack viewer ========== -->
+<div id="pack" class="modal wide" hidden>
+  <div class="modal-box">
+    <div class="modal-head">
+      <b id="pack-title">Application pack</b>
+      <button class="close" id="pack-close" aria-label="Close">✕</button>
+    </div>
+    <div class="pack-bar">
+      <div class="tabs small" id="pack-tabs"></div>
+      <div class="pack-buttons">
+        <a id="pack-download" class="btn small" download>Download</a>
+        <a id="pack-open" class="btn small" target="_blank">Open in new tab</a>
+        <button id="pack-remake" class="btn small server-only">Remake</button>
+      </div>
+    </div>
+    <p id="pack-msg" class="muted" hidden></p>
+    <iframe id="pack-frame" title="Pack file"></iframe>
+  </div>
+</div>
+
+<!-- ========== Add job pop-up ========== -->
+<div id="add" class="modal" hidden>
+  <div class="modal-box">
+    <div class="modal-head"><b>Add a job manually</b><button class="close" id="add-close" aria-label="Close">✕</button></div>
+    <form id="add-form" class="form">
+      <label>Job title <input name="title" required></label>
+      <label>Company <input name="company" required></label>
+      <label>Location <input name="location" placeholder="e.g. Valencia, Remote"></label>
+      <label>Link (optional) <input name="link" type="url" placeholder="https://..."></label>
+      <label class="wide">Full job description
+        <textarea name="description" required placeholder="Paste the whole job posting here"></textarea></label>
+      <div class="wide row"><button type="submit" class="btn primary">Save and score</button><span class="msg"></span></div>
+    </form>
+  </div>
+</div>
+
+<footer>Remote jobs from <a href="https://remotive.com">Remotive</a>, <a href="https://remoteok.com">Remote OK</a>,
+  <a href="https://himalayas.app">Himalayas</a> and <a href="https://weworkremotely.com">We Work Remotely</a>,
+  and each job links to its page there. Other jobs come from LinkedIn and Indeed via JobSpy.
+  <span id="updated"></span></footer>
+
+<!-- All the job data, made by agent/report.py -->
+<script id="data" type="application/json">{{DATA}}</script>
+<script>{{JS}}</script>
+</body>
+</html>

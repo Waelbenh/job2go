@@ -1,0 +1,32 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "oxc"],
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }],
+    // Only src/live/ may talk to serve.py (your real data). Everything else gets data as props.
+    "no-restricted-globals": ["error",
+      { "name": "fetch", "message": "Only src/live/ may call serve.py. Pass data in as props instead." },
+      { "name": "XMLHttpRequest", "message": "Only src/live/ may call serve.py." },
+      { "name": "EventSource", "message": "Only src/live/ may call serve.py." },
+      { "name": "WebSocket", "message": "Only src/live/ may call serve.py." }
+    ]
+  },
+  "overrides": [
+    {
+      // The real-data layer for /app (built later): the one place allowed to call serve.py
+      "files": ["src/live/**"],
+      "rules": { "no-restricted-globals": "off" }
+    },
+    {
+      // The public showcase and the demo use SAMPLE data only (src/demo/sampleData.ts)
+      "files": ["src/components/showcase/**", "src/pages/ShowcasePage.tsx", "src/pages/Demo*.tsx", "src/demo/**"],
+      "rules": {
+        "no-restricted-imports": ["error", {
+          "patterns": [{ "group": ["@/live", "@/live/*", "**/live/**"],
+                         "message": "The showcase and demo must never use real data. Use @/demo/sampleData." }]
+        }]
+      }
+    }
+  ]
+}

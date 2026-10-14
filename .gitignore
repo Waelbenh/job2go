@@ -1,0 +1,17 @@
+# ---- Personal files: NEVER upload these ----
+profile.yaml
+secrets.yaml
+.env
+data/
+backup/
+design-refs/
+*.log
+
+# ---- Generated / installed ----
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+web/node_modules/
+web/dist/
+.playwright-mcp/
