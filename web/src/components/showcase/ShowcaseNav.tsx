@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Logo } from '@/components/brand/Logo'
+import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -68,7 +69,8 @@ export function ShowcaseNav() {
             </li>
           ))}
         </ul>
-        <Button asChild size="sm" className="ml-auto md:ml-0">
+        <ThemeToggle className="ml-auto md:ml-0" />
+        <Button asChild size="sm" className="-ml-4">
           <a href="/demo">Try the demo</a>
         </Button>
       </nav>

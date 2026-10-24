@@ -1,4 +1,5 @@
 import { motion, type Variants } from 'motion/react'
+import { Link } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { useEntrance } from './entrance'
 import { HeroPreview } from './HeroPreview'
@@ -21,10 +22,21 @@ export function HeroText({ item }: { item: Variants }) {
       </motion.p>
       <motion.div variants={item} className="mt-9 flex flex-wrap gap-3">
         <Button size="lg" asChild>
-          <a href="/demo">Try the demo</a>
+          <Link to="/demo">Try the demo</Link>
         </Button>
         <Button size="lg" variant="secondary" asChild>
-          <a href="#how-it-works">See how it works</a>
+          <a
+            href="#how-it-works"
+            onClick={(e) => {
+              const target = document.getElementById('how-it-works')
+              if (!target) return
+              e.preventDefault()
+              target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+              history.replaceState(null, '', '#how-it-works')
+            }}
+          >
+            See how it works
+          </a>
         </Button>
       </motion.div>
       <motion.p variants={item} className="mt-6 max-w-[46ch] text-small text-ink-muted">

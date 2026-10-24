@@ -243,9 +243,9 @@ export function PinnedStory() {
 
         {/* The app window: from the tilted hero position to filling the screen */}
         {geo && (
-          <motion.div variants={item} initial="hidden" animate="show" className="absolute inset-0">
+          <motion.div variants={item} initial="hidden" animate="show" className="pointer-events-none absolute inset-0">
             <motion.div
-              className="absolute top-0 left-0 origin-top-left"
+              className="pointer-events-auto absolute top-0 left-0 origin-top-left"
               style={{ x, y, scale, rotateY, rotateX, width: geo.canvasW, height: geo.canvasH }}
             >
               <TourCanvas step={step} spotlight={spotlight} sidebarShift={sidebarShift} fade={fade} windowRef={windowRef} />

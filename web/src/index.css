@@ -108,6 +108,32 @@
   --radius-xl: 24px;
 }
 
+/* Light theme: the same token names with light values (html.light, set by ThemeToggle) */
+:root.light {
+  --color-charcoal-950: #e4e3de;
+  --color-charcoal-900: #f7f6f3;
+  --color-charcoal-850: #ffffff;
+  --color-charcoal-800: #efeee9;
+  --color-charcoal-700: #dcdbd5;
+  --color-hairline: rgb(20 21 24 / 0.1);
+  --color-ink: #1a1b1f;
+  --color-ink-muted: #55575e;
+  --color-ink-faint: #8a8c93;
+  --color-go-400: #1d7a3c;
+  --color-go-900: #dcf2e3;
+  --color-go-glow: rgb(67 196 106 / 0.25);
+  --color-score-good: #2f6fd6;
+  --color-score-maybe: #a87410;
+  --color-score-low: #c8392d;
+  --shadow-depth-1: 0 1px 2px rgb(20 21 24 / 0.08);
+  --shadow-depth-2: 0 12px 32px -12px rgb(20 21 24 / 0.18);
+  --shadow-depth-3: 0 40px 80px -24px rgb(20 21 24 / 0.25);
+  --primary-foreground: #141518;
+  color-scheme: light;
+}
+:root.light body { background: linear-gradient(180deg, #fbfaf8 0%, #f7f6f3 40%, #f1f0ec 100%) fixed, #f7f6f3; }
+:root.light body::after { opacity: 0.015; }
+
 @layer base {
   * { @apply border-border; }
   html { -webkit-text-size-adjust: 100%; }
@@ -146,7 +172,7 @@
 }
 @utility glass {
   /* The floating top bar (learned from Raycast) */
-  background: rgb(32 33 38 / 0.72);
+  background: color-mix(in srgb, var(--color-charcoal-850) 72%, transparent);
   backdrop-filter: blur(14px) saturate(140%);
   -webkit-backdrop-filter: blur(14px) saturate(140%);
   box-shadow: inset 0 0 0 1px var(--color-hairline), var(--shadow-depth-2);

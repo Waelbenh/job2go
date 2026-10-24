@@ -1,5 +1,6 @@
 import { RotateCcw } from 'lucide-react'
 import { Link } from 'react-router'
+import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import { demoSource, resetDemo } from '@/demo/demoSource'
 import { AppLayout } from '@/pages/app/AppLayout'
 
@@ -21,6 +22,7 @@ function DemoBanner() {
       >
         <RotateCcw className="size-3.5" aria-hidden /> Reset demo
       </button>
+      <ThemeToggle className="size-7 text-go-400 hover:bg-transparent" />
     </div>
   )
 }
