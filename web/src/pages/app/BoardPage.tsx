@@ -5,6 +5,7 @@ import { useData, useJobs } from '@/lib/dataSource'
 import type { Job } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { JobPanel } from './JobPanel'
+import { t } from '@/i18n'
 
 const COLUMNS = [
   { column: 'New', status: 'new' },
@@ -54,13 +55,13 @@ export function BoardPage() {
     <div className="px-4 py-6 sm:px-8 sm:py-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-wide text-display-m font-semibold">Board</h1>
-          <p className="mt-1 text-ink-muted">Drag a job when its status changes. Nothing is ever sent for you.</p>
+          <h1 className="font-wide text-display-m font-semibold">{t('Board')}</h1>
+          <p className="mt-1 text-ink-muted">{t('Drag a job when its status changes. Nothing is ever sent for you.')}</p>
         </div>
         <button type="button" onClick={() => setShowFolded(!showFolded)} aria-pressed={showFolded}
           className={cn('rounded-md px-3 py-1.5 text-small transition-colors hover:bg-charcoal-800',
             showFolded ? 'bg-charcoal-800 text-ink' : 'text-ink-muted')}>
-          {showFolded ? 'Hide' : 'Show'} rejected and not interested{' '}
+          {showFolded ? t('Hide rejected and not interested') : t('Show rejected and not interested')}{' '}
           <span className="font-mono tabular">{foldedCount}</span>
         </button>
       </header>

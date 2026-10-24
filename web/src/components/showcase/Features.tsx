@@ -3,6 +3,7 @@ import { CirclePlay, FileText, GraduationCap, HardDrive, Laptop, Lock, ShieldChe
 import { useRef, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import { ControlPreview, PackPreview, ScorePreview } from './StepPreviews'
+import { t } from '@/i18n'
 
 // "Features": five things Job2go does for you. Uneven rows (DESIGN.md: no grid of identical cards),
 // each with a small live crop of the app that plays once when it scrolls into view.
@@ -38,13 +39,13 @@ const FEATURES = [
 export function Features() {
   return (
     <section id="features" aria-labelledby="features-title" className="mx-auto max-w-[1200px] scroll-mt-24 px-4 py-24 sm:px-6">
-      <h2 id="features-title" className="font-wide text-display-m font-semibold lg:text-display-l">Features</h2>
+      <h2 id="features-title" className="font-wide text-display-m font-semibold lg:text-display-l">{t('Features')}</h2>
       <p className="mt-3 max-w-[52ch] text-body-l text-ink-muted">
-        Everything a job search needs, from the first ad to the interview, in one calm place.
+        {t('Everything a job search needs, from the first ad to the interview, in one calm place.')}
       </p>
       <div className="mt-12 grid items-start gap-5 lg:grid-cols-12">
         {FEATURES.map(({ title, text, Visual, span }) => (
-          <FeatureCard key={title} title={title} text={text} className={span} visual={(play) => <Visual play={play} />} />
+          <FeatureCard key={title} title={t(title)} text={t(text)} className={span} visual={(play) => <Visual play={play} />} />
         ))}
         <LocalCard />
       </div>
@@ -93,13 +94,13 @@ function LearnPreview({ play }: { play: boolean }) {
             className="flex items-center gap-3 rounded-md bg-charcoal-800 px-3 py-2 shadow-depth-1"
           >
             <Icon className="size-4 shrink-0 text-score-good" aria-hidden />
-            <span className="min-w-0 flex-1 truncate text-small"><span className="text-ink-muted">{where}:</span> {what}</span>
-            <span className="shrink-0 text-[0.75rem] text-ink-muted">{cost}</span>
+            <span className="min-w-0 flex-1 truncate text-small"><span className="text-ink-muted">{t(where)}:</span> {t(what)}</span>
+            <span className="shrink-0 text-[0.75rem] text-ink-muted">{t(cost)}</span>
           </motion.li>
         ))}
       </ul>
       <div className="flex items-center gap-3 px-1">
-        <span className="text-small text-ink-muted">One-week plan</span>
+        <span className="text-small text-ink-muted">{t('One-week plan')}</span>
         <div className="flex flex-1 gap-1" aria-hidden>
           {Array.from({ length: 7 }, (_, d) => (
             <motion.span
@@ -134,12 +135,10 @@ function LocalCard() {
       <div className="relative grid items-center gap-8 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:gap-12">
         <div>
           <h3 className="flex items-center gap-3 font-wide text-display-m font-semibold">
-            <ShieldCheck className="size-7 shrink-0 text-go-400" aria-hidden /> Runs on your laptop
+            <ShieldCheck className="size-7 shrink-0 text-go-400" aria-hidden /> {t('Runs on your laptop')}
           </h3>
           <p className="mt-3 max-w-[56ch] text-body-l text-ink-muted">
-            Job2go lives on your own computer. Your CV, profile and applications are stored locally and never
-            uploaded to a Job2go server. Only the text of a job ad and what it needs from your profile go to the AI,
-            the moment you ask for a score or a pack.
+            {t('Job2go lives on your own computer. Your CV, profile and applications are stored locally and never uploaded to a Job2go server. Only the text of a job ad and what it needs from your profile go to the AI, the moment you ask for a score or a pack.')}
           </p>
         </div>
         <div inert className="mx-auto w-full max-w-[26rem]">
@@ -163,15 +162,15 @@ function LocalCard() {
                   className="flex items-center gap-3 rounded-md bg-charcoal-800 px-3 py-2 text-small shadow-depth-1"
                 >
                   <HardDrive className="size-4 shrink-0 text-ink-muted" aria-hidden />
-                  <span className="flex-1">{name}</span>
-                  <span className="text-[0.75rem] text-go-400">On this computer</span>
+                  <span className="flex-1">{t(name)}</span>
+                  <span className="text-[0.75rem] text-go-400">{t('On this computer')}</span>
                 </motion.li>
               ))}
             </ul>
           </div>
           <div className="mx-[-6%] h-3 rounded-b-xl border border-t-0 border-charcoal-700 bg-charcoal-800" />
           <p className="mt-3 flex items-center justify-center gap-2 text-small text-ink-muted">
-            <Laptop className="size-4" aria-hidden /> Your files stay on this computer
+            <Laptop className="size-4" aria-hidden /> {t('Your files stay on this computer')}
           </p>
         </div>
       </div>

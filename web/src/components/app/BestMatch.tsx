@@ -5,6 +5,7 @@ import { ScoreRing } from '@/components/job/ScoreRing'
 import { StatusPill, TagList } from '@/components/job/Tag'
 import { Button } from '@/components/ui/button'
 import type { Job } from '@/lib/types'
+import { t, tList } from '@/i18n'
 
 /** The Dashboard's hero: the one job most worth your time today. */
 export function BestMatch({ job, packState = 'none', ringKey, breakdown = false, onOpen, onMakePack }: {
@@ -21,7 +22,7 @@ export function BestMatch({ job, packState = 'none', ringKey, breakdown = false,
 }) {
   const reduceMotion = useReducedMotion()
   // The AI writes strengths as one line separated by ";" - show the first 3 as a list
-  const strengths = job.strengths
+  const strengths = tList(job.strengths)
     .split(';')
     .map((s) => s.trim())
     .filter(Boolean)
@@ -29,7 +30,7 @@ export function BestMatch({ job, packState = 'none', ringKey, breakdown = false,
     .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
   return (
     <section
-      aria-label="Today's best match"
+      aria-label={t("Today's best match")}
       data-tour="best"
       className="relative overflow-hidden rounded-lg bg-charcoal-850 p-6 shadow-depth-2 @3xl:p-8"
     >
@@ -39,20 +40,20 @@ export function BestMatch({ job, packState = 'none', ringKey, breakdown = false,
         <div className="flex items-center gap-4 @3xl:flex-col @3xl:items-start">
           <ScoreRing key={ringKey} score={job.score} size="lg" className="@max-3xl:scale-75 @max-3xl:-m-4" />
           <p className="text-small text-ink-muted @3xl:max-w-34">
-            AI fit <span className="font-mono text-ink tabular">{job.fit}</span>, rules{' '}
+            {t('AI fit')} <span className="font-mono text-ink tabular">{job.fit}</span>, {t('rules')}{' '}
             <span className="font-mono text-ink tabular">{job.adjustments.split(' ')[0]}</span>
           </p>
         </div>
         <div className="min-w-0">
-          <p className="text-small text-ink-muted">Today's best match</p>
+          <p className="text-small text-ink-muted">{t("Today's best match")}</p>
           <h2 className="mt-1 font-wide text-display-m font-semibold">{job.title}</h2>
           <p className="mt-1.5 flex flex-wrap gap-x-4 text-ink-muted">
             <span className="text-ink">{job.company}</span>
             <span>{job.location}</span>
-            <span>via {job.source}</span>
+            <span>{t('via {source}', { source: t(job.source) })}</span>
           </p>
           <TagList tags={job.key_tags} className="mt-4" />
-          <p className="mt-4 max-w-[68ch] text-ink-muted">{job.summary}</p>
+          <p className="mt-4 max-w-[68ch] text-ink-muted">{t(job.summary)}</p>
           {breakdown ? (
             <ScoreBreakdown job={job} className="mt-5" />
           ) : strengths.length > 0 && (
@@ -74,16 +75,16 @@ export function BestMatch({ job, packState = 'none', ringKey, breakdown = false,
                 className="flex items-center gap-3"
               >
                 <StatusPill status="pack ready" />
-                <Button variant="secondary" onClick={onOpen}>View pack</Button>
+                <Button variant="secondary" onClick={onOpen}>{t('View pack')}</Button>
               </motion.div>
             ) : packState === 'working' ? (
               <Button size="lg" variant="secondary" disabled className="disabled:opacity-100">
-                <Loader2 className="animate-spin" aria-hidden /> Making application pack
+                <Loader2 className="animate-spin" aria-hidden /> {t('Making application pack')}
               </Button>
             ) : (
-              <Button size="lg" onClick={onMakePack}>Make application pack</Button>
+              <Button size="lg" onClick={onMakePack}>{t('Make application pack')}</Button>
             )}
-            <Button variant="ghost" size="lg" onClick={onOpen}>Open job</Button>
+            <Button variant="ghost" size="lg" onClick={onOpen}>{t('Open job')}</Button>
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from 'motion/react'
 import { sampleFilteredOut } from '@/demo/sampleData'
+import { t } from '@/i18n'
 
 /** Jobs the free filters drop: each shows its reason, then fades and is crossed out.
  *  `play` runs it; without play (or with reduced motion) the rows show their end state.
@@ -8,7 +9,7 @@ export function FilteredRows({ play }: { play: boolean }) {
   const reduceMotion = useReducedMotion()
   const animate = play && !reduceMotion
   return (
-    <ul className="grid" aria-label="Jobs filtered out">
+    <ul className="grid" aria-label={t('Jobs filtered out')}>
       {sampleFilteredOut.map(({ job, reason }, i) => (
         <li key={job.n} className="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-b border-hairline px-4 py-3">
           {/* the job fades; its red reason stays readable */}
@@ -45,7 +46,7 @@ export function FilteredRows({ play }: { play: boolean }) {
             transition={animate ? { duration: 0.3, delay: 0.3 + i * 0.45 } : { duration: 0 }}
             className="ml-14 shrink-0 rounded-sm bg-[#3a1d1b] px-2 py-0.5 text-small whitespace-nowrap text-[#f4887e] @md:ml-0"
           >
-            {reason}
+            {t(reason)}
           </motion.span>
         </li>
       ))}

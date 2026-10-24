@@ -9,6 +9,7 @@ import { useToast } from '@/components/app/toast-context'
 import { DataContext, JobsContext, useJobsLoader, type DataSource } from '@/lib/dataSource'
 import { SearchContext } from './search'
 import { AddJobDialog, RunSearchDialog } from './TopBarDialogs'
+import { t } from '@/i18n'
 
 const links = (base: string): Record<AppPage, string> => ({
   dashboard: base, jobs: `${base}/jobs`, board: `${base}/board`, packs: `${base}/packs`, profile: `${base}/profile`,
@@ -59,12 +60,12 @@ function Layout({ source, base, banner }: { source: DataSource; base: string; ba
                       setQuery(e.target.value)
                       navigate(`${base}/jobs`)
                     }}
-                    placeholder="Search jobs and companies"
-                    aria-label="Search jobs and companies"
+                    placeholder={t('Search jobs and companies')}
+                    aria-label={t('Search jobs and companies')}
                     className="min-w-0 flex-1 bg-transparent text-small text-ink outline-none placeholder:text-ink-faint"
                   />
                   {query && (
-                    <button type="button" onClick={() => setQuery('')} aria-label="Clear the search" className="text-ink-faint hover:text-ink">
+                    <button type="button" onClick={() => setQuery('')} aria-label={t('Clear the search')} className="text-ink-faint hover:text-ink">
                       <X className="size-4" />
                     </button>
                   )}
@@ -81,10 +82,10 @@ function Layout({ source, base, banner }: { source: DataSource; base: string; ba
           </div>
         </div>
         <AddJobDialog open={adding} onClose={() => setAdding(false)} />
-        <Dialog open={showRun && Boolean(run.status)} onClose={() => setShowRun(false)} title="Searching for jobs">
-          <p className="text-small text-ink-muted">The last lines the search printed. This closes by itself when it is done.</p>
+        <Dialog open={showRun && Boolean(run.status)} onClose={() => setShowRun(false)} title={t('Searching for jobs')}>
+          <p className="text-small text-ink-muted">{t('The last lines the search printed. This closes by itself when it is done.')}</p>
           <pre className="mt-4 max-h-80 overflow-auto rounded-md bg-charcoal-950 p-4 font-sans text-small leading-relaxed whitespace-pre-wrap text-ink-muted">
-            {run.lines.join('\n') || 'Starting'}
+            {run.lines.map((l) => t(l)).join('\n') || t('Starting')}
           </pre>
         </Dialog>
         <RunSearchDialog open={confirmRun} onClose={() => setConfirmRun(false)} onStart={() => { setConfirmRun(false); void run.start() }} />
@@ -119,11 +120,11 @@ function useSearchRun(api: DataSource, reload: () => Promise<void>, toast: (m: s
         const last = s.lines.filter((l) => l.trim()).at(-1) ?? 'Starting'
         // run.py does not say how far it is, so the bar shows the time spent (it fills in about 10 minutes)
         const minutes = parseInt(s.elapsed) || 0
-        setStatus({ label: last.replace(/^[=\s-]+/, '').slice(0, 42), progress: Math.min(0.95, 0.05 + minutes / 10) })
+        setStatus({ label: t(last).replace(/^[=\s-]+/, '').slice(0, 42), progress: Math.min(0.95, 0.05 + minutes / 10) })
         if (!s.running) {
           setWatching(false)
           setStatus(undefined)
-          toast(s.code === 0 ? 'Search finished. Your jobs are up to date.' : 'The search stopped with an error. See the Terminal where serve.py runs.', s.code === 0)
+          toast(s.code === 0 ? t('Search finished. Your jobs are up to date.') : t('The search stopped with an error. See the Terminal where serve.py runs.'), s.code === 0)
           void reload()
         }
       } catch {
@@ -140,8 +141,8 @@ function useSearchRun(api: DataSource, reload: () => Promise<void>, toast: (m: s
 function ServerDown({ message }: { message: string }) {
   return (
     <div className="mx-auto grid max-w-[40rem] gap-3 px-8 py-24">
-      <h1 className="font-wide text-display-m font-semibold">Your jobs could not load</h1>
-      <p className="text-ink-muted">{message}</p>
+      <h1 className="font-wide text-display-m font-semibold">{t('Your jobs could not load')}</h1>
+      <p className="text-ink-muted">{t(message)}</p>
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { Moon, Sun } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
+import { t } from '@/i18n'
 
 type Theme = 'dark' | 'light'
 const KEY = 'job2go-theme'
@@ -18,7 +19,7 @@ export function ThemeToggle({ className }: { className?: string }) {
     try { localStorage.setItem(KEY, next) } catch { /* storage blocked: still switches */ }
     setTheme(next)
   }
-  const label = theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'
+  const label = theme === 'dark' ? t('Switch to light theme') : t('Switch to dark theme')
   return (
     <button
       type="button"

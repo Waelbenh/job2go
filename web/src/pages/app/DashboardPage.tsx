@@ -5,6 +5,7 @@ import { useBase, useJobs } from '@/lib/dataSource'
 import type { Job } from '@/lib/types'
 import { DashboardCharts } from './DashboardCharts'
 import { JobPanel } from './JobPanel'
+import { t } from '@/i18n'
 
 const SHOW_NEW = 8 // new jobs listed here; the rest are in Jobs
 
@@ -32,19 +33,19 @@ export function DashboardPage() {
           packState={packState(best)}
           onOpenJob={(job) => setOpen(job.n)}
           onMakePack={(job) => setOpen(job.n)}
-          emptyList={<p className="px-4 py-6 text-ink-muted">No other new jobs since the last search.</p>}
+          emptyList={<p className="px-4 py-6 text-ink-muted">{t('No other new jobs since the last search.')}</p>}
         >
           {fresh.length > SHOW_NEW && (
             <Link to={`${base}/jobs`} className="-mt-4 px-4 text-score-good underline-offset-4 hover:underline">
-              See all {fresh.length} new jobs in Jobs
+              {t('See all {n} new jobs in Jobs', { n: fresh.length })}
             </Link>
           )}
           <DashboardCharts charts={data.charts} funnel={data.funnel} />
         </DashboardView>
       ) : (
         <div className="grid gap-3 px-8 py-16">
-          <h1 className="font-wide text-display-m font-semibold">Today</h1>
-          <p className="text-ink-muted">No good matches to look at right now. Press Run search to look for new jobs.</p>
+          <h1 className="font-wide text-display-m font-semibold">{t('Today')}</h1>
+          <p className="text-ink-muted">{t('No good matches to look at right now. Press Run search to look for new jobs.')}</p>
         </div>
       )}
       <JobPanel number={open} onClose={() => setOpen(null)} />

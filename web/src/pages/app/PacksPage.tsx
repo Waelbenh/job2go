@@ -8,6 +8,7 @@ import type { Job } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { JobPanel } from './JobPanel'
 import { PackQuality, RemakePack } from './PackExtras'
+import { t } from '@/i18n'
 
 const DOCS = [
   { key: 'cv', label: 'CV', icon: FileText },
@@ -32,10 +33,10 @@ export function PacksPage() {
   if (!current) {
     return (
       <div className="mx-auto grid max-w-[40rem] gap-3 px-8 py-24">
-        <h1 className="font-wide text-display-m font-semibold">No packs yet</h1>
+        <h1 className="font-wide text-display-m font-semibold">{t('No packs yet')}</h1>
         <p className="text-ink-muted">
-          Open a job in <Link to={`${base}/jobs`} className="text-score-good underline-offset-4 hover:underline">Jobs</Link> and
-          press Make application pack. Its CV, letter and interview prep show up here.
+          {t('Open a job in')} <Link to={`${base}/jobs`} className="text-score-good underline-offset-4 hover:underline">{t('Jobs')}</Link>{' '}
+          {t('and press Make application pack. Its CV, letter and interview prep show up here.')}
         </p>
       </div>
     )
@@ -46,9 +47,9 @@ export function PacksPage() {
   return (
     <div className="grid h-full grid-rows-[auto_1fr] overflow-hidden md:grid-cols-[19rem_1fr] md:grid-rows-1">
       {/* ---- The jobs with a pack ---- */}
-      <nav aria-label="Packs" className="max-h-56 overflow-y-auto border-b border-hairline p-4 md:max-h-none md:border-r md:border-b-0">
+      <nav aria-label={t('Packs')} className="max-h-56 overflow-y-auto border-b border-hairline p-4 md:max-h-none md:border-r md:border-b-0">
         <h1 className="px-2 pt-2 pb-4 font-wide text-title font-semibold">
-          Packs <span className="font-mono text-num text-ink-muted tabular">{packs.length}</span>
+          {t('Packs')} <span className="font-mono text-num text-ink-muted tabular">{packs.length}</span>
         </h1>
         <ul className="grid grid-cols-[minmax(0,1fr)] gap-1">
           {packs.map((job) => (
@@ -69,31 +70,31 @@ export function PacksPage() {
       </nav>
 
       {/* ---- The open document ---- */}
-      <section aria-label="Open document" className="flex min-w-0 flex-col">
+      <section aria-label={t('Open document')} className="flex min-w-0 flex-col">
         <header className="flex flex-wrap items-center gap-x-6 gap-y-3 border-b border-hairline px-6 py-4">
           <div className="min-w-0 basis-full">
             <h2 className="truncate font-wide text-title font-semibold">{current.title}</h2>
             <p className="text-small text-ink-muted">{current.company}</p>
             <div className="mt-1"><PackQuality job={current} /></div>
           </div>
-          <div className="flex gap-1 rounded-md bg-charcoal-850 p-1 shadow-depth-1" role="tablist" aria-label="Document">
+          <div className="flex gap-1 rounded-md bg-charcoal-850 p-1 shadow-depth-1" role="tablist" aria-label={t('Document')}>
             {DOCS.filter((d) => current.files[d.key]).map(({ key, label, icon: Icon }) => (
               <button key={key} type="button" role="tab" aria-selected={shown === key} onClick={() => setDoc(key)}
                 className={cn('flex items-center gap-2 rounded-sm px-3 py-1.5 text-small transition-colors',
                   shown === key ? 'bg-charcoal-700 text-ink' : 'text-ink-muted hover:text-ink')}>
-                <Icon className="size-4" aria-hidden /> {label}
+                <Icon className="size-4" aria-hidden /> {t(label)}
               </button>
             ))}
           </div>
           <div className="ml-auto flex flex-wrap gap-2">
             <RemakePack job={current} size="sm" />
             <Button variant="secondary" size="sm" asChild>
-              <a href={fileUrl(file)} download><Download aria-hidden /> Download</a>
+              <a href={fileUrl(file)} download><Download aria-hidden /> {t('Download')}</a>
             </Button>
             <Button variant="ghost" size="sm" asChild>
-              <a href={fileUrl(file)} target="_blank" rel="noreferrer">New tab <ExternalLink aria-hidden /></a>
+              <a href={fileUrl(file)} target="_blank" rel="noreferrer">{t('New tab')} <ExternalLink aria-hidden /></a>
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => setPanel(current.n)}>Open job</Button>
+            <Button variant="ghost" size="sm" onClick={() => setPanel(current.n)}>{t('Open job')}</Button>
           </div>
         </header>
         {/* PDFs and the prep sheet are served by serve.py (only files inside data/applications/) */}

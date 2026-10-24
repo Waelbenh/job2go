@@ -5,13 +5,14 @@ import { sampleStats } from '@/demo/sampleData'
 import { cn } from '@/lib/utils'
 import { SOURCES, type Source } from './sourceList'
 import { Station } from './Station'
+import { t } from '@/i18n'
 
 /** One job site's logo tile: the official logo when there is one, otherwise its letters. */
 export function SourceLogo({ source, size = 40 }: { source: Source; size?: number }) {
   return (
     <span
       role="img"
-      aria-label={`${source.name} logo`}
+      aria-label={t('{name} logo', { name: source.name })}
       className="grid shrink-0 place-items-center rounded-[10px] font-bold text-white shadow-depth-1 ring-1 ring-white/10 ring-inset"
       style={{ width: size, height: size, background: source.color }}
     >
@@ -71,16 +72,16 @@ export function SearchRun({ play, className }: { play: boolean; className?: stri
     <section data-tour="search" className={cn('@container relative rounded-lg bg-charcoal-850 p-5 shadow-depth-2', className)}>
       <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-1">
         <div>
-          <p className="text-small text-ink-muted">Morning search, on your computer</p>
-          <h3 className="mt-0.5 text-title font-semibold">Reading 7 job sites</h3>
+          <p className="text-small text-ink-muted">{t('Morning search, on your computer')}</p>
+          <h3 className="mt-0.5 text-title font-semibold">{t('Reading 7 job sites')}</h3>
         </div>
         <p className="text-small text-ink-muted">
-          Every day at <span className="font-mono text-ink tabular">07:00</span>
+          {t('Every day at')} <span className="font-mono text-ink tabular">07:00</span>
         </p>
       </div>
 
       <div ref={box} className="relative mt-5">
-        <ul className="grid grid-cols-4 gap-x-2 gap-y-4 @xl:grid-cols-7" aria-label="Job sites">
+        <ul className="grid grid-cols-4 gap-x-2 gap-y-4 @xl:grid-cols-7" aria-label={t('Job sites')}>
           {SOURCES.map((source, i) => (
             <motion.li
               key={source.name}
@@ -109,7 +110,7 @@ export function SearchRun({ play, className }: { play: boolean; className?: stri
           </div>
           <Station lit={finished} />
           <p className="text-small whitespace-nowrap text-ink-muted">
-            <motion.span className="font-mono text-ink tabular">{shown}</motion.span> new jobs
+            <motion.span className="font-mono text-ink tabular">{shown}</motion.span> {t('new jobs')}
           </p>
         </div>
 

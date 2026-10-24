@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { useEntrance } from './entrance'
 import { HeroPreview } from './HeroPreview'
+import { t } from '@/i18n'
 
 /** The headline, intro, buttons and note. Used by the normal hero and by the pinned scroll story. */
 export function HeroText({ item }: { item: Variants }) {
@@ -10,19 +11,18 @@ export function HeroText({ item }: { item: Variants }) {
     <>
       <motion.h1 id="hero-title" variants={item} className="font-wide">
         <span className="block text-[clamp(1.5rem,2.4vw,2.125rem)] leading-tight font-medium text-ink-muted">
-          Your AI job assistant,
+          {t('Your AI job assistant,')}
         </span>
         <span className="mt-1 block text-[clamp(3rem,5.6vw,4.375rem)] leading-[0.95] font-bold tracking-[-0.02em] whitespace-nowrap">
-          ready to go.
+          {t('ready to go.')}
         </span>
       </motion.h1>
       <motion.p variants={item} className="mt-7 max-w-[46ch] text-body-l text-ink-muted">
-        Job2go reads new job ads every morning, scores each one against your profile, and writes a
-        tailored CV and cover letter for the ones worth your time.
+        {t('Job2go reads new job ads every morning, scores each one against your profile, and writes a tailored CV and cover letter for the ones worth your time.')}
       </motion.p>
       <motion.div variants={item} className="mt-9 flex flex-wrap gap-3">
         <Button size="lg" asChild>
-          <Link to="/demo">Try the demo</Link>
+          <Link to="/demo">{t('Try the demo')}</Link>
         </Button>
         <Button size="lg" variant="secondary" asChild>
           <a
@@ -35,12 +35,12 @@ export function HeroText({ item }: { item: Variants }) {
               history.replaceState(null, '', '#how-it-works')
             }}
           >
-            See how it works
+            {t('See how it works')}
           </a>
         </Button>
       </motion.div>
       <motion.p variants={item} className="mt-6 max-w-[46ch] text-small text-ink-muted">
-        Runs on your computer. You stay in control and send every application yourself.
+        {t('Runs on your computer. You stay in control and send every application yourself.')}
       </motion.p>
     </>
   )

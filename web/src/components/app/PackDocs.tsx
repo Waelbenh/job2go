@@ -1,6 +1,7 @@
 import { FileText, MessagesSquare, PenLine } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
 import { cn } from '@/lib/utils'
+import { t } from '@/i18n'
 
 const DOCS = [
   { key: 'cv', title: 'CV', note: 'Tailored to this job', icon: FileText, lines: [70, 92, 84, 60, 88, 76, 54] },
@@ -35,8 +36,8 @@ export function PackDocs({ show = 3, className }: { show?: number; className?: s
           <div className="flex items-start gap-2">
             <Icon className="mt-0.5 size-4 shrink-0 text-go-400" aria-hidden />
             <div>
-              <p className="text-small font-semibold">{title}</p>
-              <p className="text-[0.75rem] text-ink-muted">{note}</p>
+              <p className="text-small font-semibold">{t(title)}</p>
+              <p className="text-[0.75rem] text-ink-muted">{t(note)}</p>
             </div>
           </div>
         </motion.li>

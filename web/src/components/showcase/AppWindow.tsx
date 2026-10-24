@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode, Ref } from 'react'
 import { cn } from '@/lib/utils'
+import { t } from '@/i18n'
 
 /** A desktop-app window frame (three dots + title) around a picture of the app.
  *  `inert`: it is a picture, so nothing inside can be clicked or reached with Tab. */
@@ -16,7 +17,7 @@ export function AppWindow({ children, className, style, bodyClassName, bodyStyle
       ref={ref}
       inert
       role="img"
-      aria-label="Preview of the Job2go AI app with sample jobs"
+      aria-label={t('Preview of the Job2go AI app with sample jobs')}
       className={cn('overflow-hidden rounded-xl bg-charcoal-900 shadow-depth-3 ring-1 ring-hairline', className)}
       style={style}
     >

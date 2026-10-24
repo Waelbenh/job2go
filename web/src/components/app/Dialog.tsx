@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { X } from 'lucide-react'
 import { useEffect, type ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
+import { t } from '@/i18n'
 
 /** A centered pop-up (Add job, Run search). Esc or the X closes it. */
 export function Dialog({ open, onClose, title, children }: {
@@ -33,7 +34,7 @@ export function Dialog({ open, onClose, title, children }: {
           >
             <div className="flex items-start justify-between gap-4">
               <h2 id="dialog-title" className="font-wide text-title font-semibold">{title}</h2>
-              <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Close"><X /></Button>
+              <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label={t('Close')}><X /></Button>
             </div>
             <div className="mt-5">{children}</div>
           </motion.div>

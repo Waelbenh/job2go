@@ -6,16 +6,17 @@ import { Button } from '@/components/ui/button'
 import { useData, useJobs } from '@/lib/dataSource'
 import type { Job, LearningGuide as Guide } from '@/lib/types'
 import { inputClass } from './TopBarDialogs'
+import { t, tList } from '@/i18n'
 
 /** The pack's quality score, and a note when the polish step was skipped */
 export function PackQuality({ job }: { job: Job }) {
   if (!job.quality && job.pack_polished !== false) return null
   return (
     <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-small text-ink-muted">
-      {job.quality && <span>Pack quality <span className="font-mono text-ink tabular">{job.quality}</span>/10</span>}
+      {job.quality && <span>{t('Pack quality')} <span className="font-mono text-ink tabular">{job.quality}</span>/10</span>}
       {job.pack_polished === false && (
         <span className="inline-flex items-center gap-1.5 text-score-maybe">
-          <TriangleAlert className="size-3.5" aria-hidden /> Not polished, remake when Claude is available
+          <TriangleAlert className="size-3.5" aria-hidden /> {t('Not polished, remake when Claude is available')}
         </span>
       )}
     </p>
@@ -46,27 +47,25 @@ export function RemakePack({ job, onDone, size = 'lg' }: { job: Job; onDone?: ()
   return (
     <>
       <Button variant="secondary" size={size} disabled={busy} onClick={() => setOpen(true)}>
-        {busy ? <><Loader2 className="animate-spin" aria-hidden /> Remaking pack</> : <><RotateCcw aria-hidden /> Remake pack</>}
+        {busy ? <><Loader2 className="animate-spin" aria-hidden /> {t('Remaking pack')}</> : <><RotateCcw aria-hidden /> {t('Remake pack')}</>}
       </Button>
-      <Dialog open={open} onClose={() => setOpen(false)} title="Remake this pack?">
+      <Dialog open={open} onClose={() => setOpen(false)} title={t('Remake this pack?')}>
         <div className="grid gap-4">
           <p className="text-ink-muted">
-            The whole pack is made again the normal way, including the polish step, and gets a new quality score.
-            When it is ready it replaces the current one (a copy of the old one is kept in the pack's old folder).
-            If it fails, nothing changes. It takes a few minutes and uses your AI allowance.
+            {t("The whole pack is made again the normal way, including the polish step, and gets a new quality score. When it is ready it replaces the current one (a copy of the old one is kept in the pack's old folder). If it fails, nothing changes. It takes a few minutes and uses your AI allowance.")}
           </p>
           <label className="grid gap-1.5">
-            <span className="text-small font-semibold">What should be better? <span className="font-normal text-ink-muted">(optional)</span></span>
+            <span className="text-small font-semibold">{t('What should be better?')} <span className="font-normal text-ink-muted">{t('(optional)')}</span></span>
             <textarea className={`${inputClass} min-h-24 resize-y`} value={note} onChange={(e) => setNote(e.target.value)}
-              placeholder="For example: a shorter letter, put the CRM work first" maxLength={1000} />
+              placeholder={t('For example: a shorter letter, put the process work first')} maxLength={1000} />
           </label>
           <div className="flex gap-3">
-            <Button onClick={remake}>Remake pack</Button>
-            <Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button onClick={remake}>{t('Remake pack')}</Button>
+            <Button variant="secondary" onClick={() => setOpen(false)}>{t('Cancel')}</Button>
           </div>
         </div>
       </Dialog>
-      {busy && <p className="basis-full text-small text-ink-muted">Making the new pack. This takes a few minutes; your current pack stays until the new one is ready.</p>}
+      {busy && <p className="basis-full text-small text-ink-muted">{t('Making the new pack. This takes a few minutes; your current pack stays until the new one is ready.')}</p>}
     </>
   )
 }
@@ -97,30 +96,29 @@ export function LearningGuide({ job }: { job: Job }) {
     <section aria-labelledby="guide" className="grid gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h3 id="guide" className="flex items-center gap-2 text-title font-semibold">
-          <BookOpen className="size-5 text-score-good" aria-hidden /> Learning guide
+          <BookOpen className="size-5 text-score-good" aria-hidden /> {t('Learning guide')}
         </h3>
         <Button variant={guide ? 'ghost' : 'secondary'} size="sm" disabled={busy} onClick={() => setAsking(true)}>
-          {busy ? <><Loader2 className="animate-spin" aria-hidden /> Making the guide</>
-            : guide ? <><RotateCcw aria-hidden /> Remake guide</> : 'Make a learning guide'}
+          {busy ? <><Loader2 className="animate-spin" aria-hidden /> {t('Making the guide')}</>
+            : guide ? <><RotateCcw aria-hidden /> {t('Remake guide')}</> : t('Make a learning guide')}
         </Button>
       </div>
       {!guide && !busy && (
         <p className="text-small text-ink-muted">
-          A short plan for the To learn points of this job: what each one is, free courses and videos, the time it
-          takes, and a one-week plan to be ready for the interview.
+          {t('A short plan for the To learn points of this job: what each one is, free courses and videos, the time it takes, and a one-week plan to be ready for the interview.')}
         </p>
       )}
       {guide && <GuideView guide={guide} />}
-      <Dialog open={asking} onClose={() => setAsking(false)} title={guide ? 'Make the guide again?' : 'Make a learning guide?'}>
+      <Dialog open={asking} onClose={() => setAsking(false)} title={guide ? t('Make the guide again?') : t('Make a learning guide?')}>
         <p className="text-ink-muted">
-          The AI writes a guide for these points, using your AI allowance. It takes up to a minute.
+          {t('The AI writes a guide for these points, using your AI allowance. It takes up to a minute.')}
         </p>
         <ul className="mt-3 grid gap-1 text-small">
-          {job.to_learn.split(';').map((t) => t.trim()).filter(Boolean).map((t) => <li key={t}>{t}</li>)}
+          {tList(job.to_learn).split(';').map((s) => s.trim()).filter(Boolean).map((s) => <li key={s}>{s}</li>)}
         </ul>
         <div className="mt-6 flex gap-3">
-          <Button onClick={make}>{guide ? 'Remake guide' : 'Make the guide'}</Button>
-          <Button variant="secondary" onClick={() => setAsking(false)}>Cancel</Button>
+          <Button onClick={make}>{guide ? t('Remake guide') : t('Make the guide')}</Button>
+          <Button variant="secondary" onClick={() => setAsking(false)}>{t('Cancel')}</Button>
         </div>
       </Dialog>
     </section>
@@ -137,7 +135,7 @@ function GuideView({ guide }: { guide: Guide }) {
             <span className="text-small text-ink-muted">{item.hours}</span>
           </div>
           <p className="mt-2 text-small text-ink-muted">{item.what_it_is}</p>
-          <p className="mt-1.5 text-small"><span className="text-ink-muted">Why this job needs it:</span> {item.why_this_job}</p>
+          <p className="mt-1.5 text-small"><span className="text-ink-muted">{t('Why this job needs it:')}</span> {item.why_this_job}</p>
           <ul className="mt-3 grid gap-2">
             {item.resources.map((r) => (
               <li key={r.url} className="text-small">
@@ -151,16 +149,16 @@ function GuideView({ guide }: { guide: Guide }) {
         </article>
       ))}
       <details className="rounded-lg bg-charcoal-850 p-5 shadow-depth-1">
-        <summary className="cursor-pointer font-semibold">One-week plan</summary>
+        <summary className="cursor-pointer font-semibold">{t('One-week plan')}</summary>
         <ol className="mt-3 grid gap-2 text-small">
           {guide.week.map((d) => (
             <li key={d.day} className="grid grid-cols-[4rem_1fr] gap-3"><span className="text-ink-muted">{d.day}</span><span>{d.plan}</span></li>
           ))}
         </ol>
       </details>
-      <p className="text-small"><span className="text-ink-muted">In the interview:</span> {guide.interview_tip}</p>
+      <p className="text-small"><span className="text-ink-muted">{t('In the interview:')}</span> {guide.interview_tip}</p>
       <p className="text-[0.75rem] text-ink-muted">
-        Made on <span className="font-mono tabular">{guide.made_on}</span> by {guide.made_by}. The links are searches on each site, so they always open.
+        {t('Made on')} <span className="font-mono tabular">{guide.made_on}</span> {t('by {who}. The links are searches on each site, so they always open.', { who: t(guide.made_by) })}
       </p>
     </div>
   )

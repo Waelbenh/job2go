@@ -2,6 +2,7 @@ import { AlertTriangle, Check, CircleHelp, Sprout } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
 import type { Job } from '@/lib/types'
 import { cn } from '@/lib/utils'
+import { t, tList } from '@/i18n'
 
 // The 4 parts of a score, each with an icon + a word, so meaning never depends on color alone
 const PARTS = [
@@ -18,7 +19,7 @@ export function ScoreBreakdown({ job, animate = true, className }: { job: Job; a
   return (
     <div className={cn('grid gap-3 @2xl:grid-cols-2', className)}>
       {PARTS.map(({ key, label, icon: Icon, tone, empty }, i) => {
-        const items = job[key].split(';').map((s) => s.trim()).filter(Boolean)
+        const items = tList(job[key]).split(';').map((s) => s.trim()).filter(Boolean)
         return (
           <motion.section
             key={key}
@@ -31,11 +32,11 @@ export function ScoreBreakdown({ job, animate = true, className }: { job: Job; a
               <span className={cn('grid size-5 place-items-center rounded-sm', tone)}>
                 <Icon className="size-3.5" aria-hidden />
               </span>
-              {label}
+              {t(label)}
             </h4>
             <ul className="mt-1.5 grid gap-0.5 text-small text-ink-muted">
               {items.length ? items.map((item) => <li key={item}>{item.charAt(0).toUpperCase() + item.slice(1)}</li>)
-                : <li>{empty}</li>}
+                : <li>{t(empty)}</li>}
             </ul>
           </motion.section>
         )

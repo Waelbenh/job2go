@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useData, type Usage } from '@/lib/dataSource'
 import type { PageData } from '@/lib/types'
 import { scoreColor } from '@/lib/score'
+import { t } from '@/i18n'
 
 /** The Dashboard's three small charts. Each is one series, so the title names it (no legend);
  *  every bar shows its exact number on hover, and the important numbers are written out. */
@@ -9,16 +10,16 @@ export function DashboardCharts({ charts, funnel }: { charts: PageData['charts']
   return (
     <div className="grid gap-4 @4xl:grid-cols-2 @6xl:grid-cols-[5fr_4fr_4fr]">
       {funnel && <WeekFunnel funnel={funnel} />}
-      <Panel title="Where your jobs come from">
+      <Panel title={t('Where your jobs come from')}>
         <SourceBars rows={charts.sources} />
       </Panel>
-      <Panel title="Scores of all jobs">
+      <Panel title={t('Scores of all jobs')}>
         <Columns rows={charts.scores.map(([score, count]) => ({ label: String(score), value: count, color: scoreColor(score) }))}
-          labelEvery={1} hint={(r) => `Score ${r.label}: ${r.value} jobs`} />
+          labelEvery={1} hint={(r) => t('Score {score}: {n} jobs', { score: r.label, n: r.value })} />
       </Panel>
-      <Panel title="Applications per week">
+      <Panel title={t('Applications per week')}>
         <Columns rows={charts.weeks.map(([week, count]) => ({ label: week, value: count, color: 'var(--color-go-500)' }))}
-          labelEvery={charts.weeks.length - 1} hint={(r) => `Week of ${r.label}: ${r.value} sent`} />
+          labelEvery={charts.weeks.length - 1} hint={(r) => t('Week of {week}: {n} sent', { week: r.label, n: r.value })} />
       </Panel>
       <UsagePanel />
     </div>
@@ -40,8 +41,8 @@ function SourceBars({ rows }: { rows: [string, number][] }) {
   return (
     <ul className="grid gap-2">
       {rows.map(([name, value]) => (
-        <li key={name} className="grid grid-cols-[8rem_1fr_3rem] items-center gap-3 text-small" title={`${name}: ${value} jobs`}>
-          <span className="truncate text-ink-muted">{name}</span>
+        <li key={name} className="grid grid-cols-[8rem_1fr_3rem] items-center gap-3 text-small" title={t('{name}: {n} jobs', { name: t(name), n: value })}>
+          <span className="truncate text-ink-muted">{t(name)}</span>
           <span className="h-2 rounded-r-[4px] bg-ink-muted/55" style={{ width: `${Math.max(1.5, (value / max) * 100)}%` }} />
           <span className="text-right font-mono text-[0.75rem] text-ink tabular">{value}</span>
         </li>
@@ -93,27 +94,27 @@ export function UsagePanel() {
   const share = usage.claude_cap ? Math.min(1, usage.claude_used / usage.claude_cap) : 1
   return (
     <section className="rounded-lg bg-charcoal-850 p-5 shadow-depth-2">
-      <h2 className="text-small font-semibold">AI usage today</h2>
+      <h2 className="text-small font-semibold">{t('AI usage today')}</h2>
       <div className="mt-4 grid gap-3 text-small">
         <div>
           <p className="flex justify-between gap-4">
-            <span>Claude scoring</span>
+            <span>{t('Claude scoring')}</span>
             <span className="text-ink-muted">
               {usage.claude_on
-                ? <><span className="font-mono text-ink tabular">{usage.claude_used}</span> of <span className="font-mono tabular">{usage.claude_cap}</span> jobs</>
-                : 'switched off'}
+                ? <><span className="font-mono text-ink tabular">{usage.claude_used}</span> {t('of')} <span className="font-mono tabular">{usage.claude_cap}</span> {t('jobs')}</>
+                : t('switched off')}
             </span>
           </p>
-          <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-charcoal-700" title={`${Math.round(share * 100)}% of today's cap`}>
+          <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-charcoal-700" title={t("{p}% of today's cap", { p: Math.round(share * 100) })}>
             <div className="h-full rounded-full" style={{ width: `${share * 100}%`, background: share >= 1 ? 'var(--color-score-low)' : share >= 0.8 ? 'var(--color-score-maybe)' : 'var(--color-go-500)' }} />
           </div>
         </div>
         {usage.gemini.map((g) => (
           <p key={g.role} className="flex justify-between gap-4" title={g.model}>
             <span className="flex items-center gap-2">
-              <span className={`size-2 rounded-full ${g.out ? 'bg-score-low' : 'bg-go-500'}`} aria-hidden /> Gemini, {g.role.toLowerCase()}
+              <span className={`size-2 rounded-full ${g.out ? 'bg-score-low' : 'bg-go-500'}`} aria-hidden /> Gemini, {t(g.role).toLowerCase()}
             </span>
-            <span className="text-ink-muted">{g.out ? 'out of quota until tomorrow' : 'available'}</span>
+            <span className="text-ink-muted">{g.out ? t('out of quota until tomorrow') : t('available')}</span>
           </p>
         ))}
       </div>
@@ -129,7 +130,7 @@ function WeekFunnel({ funnel }: { funnel: NonNullable<PageData['funnel']> }) {
   const most = Math.max(1, ...funnel.filtered.map(([, n]) => n))
   return (
     <section className="rounded-lg bg-charcoal-850 p-5 shadow-depth-2 @4xl:col-span-2 @6xl:col-span-3">
-      <h2 className="text-small font-semibold">The last {funnel.days} days</h2>
+      <h2 className="text-small font-semibold">{t('The last {n} days', { n: funnel.days })}</h2>
       <div className="mt-4 grid gap-6 @4xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         {/* the route: four stations on the green line */}
         <ol className="relative grid grid-cols-4">
@@ -138,15 +139,15 @@ function WeekFunnel({ funnel }: { funnel: NonNullable<PageData['funnel']> }) {
             <li key={label} className="relative grid justify-items-center gap-2 text-center">
               <span aria-hidden className={`size-5 rounded-full border-2 bg-charcoal-900 ${i === 3 ? 'border-go-500 shadow-glow-go' : 'border-go-500'}`} />
               <span className="font-mono text-[1.375rem] leading-none text-ink tabular">{value}</span>
-              <span className="text-small text-ink-muted">{label}</span>
+              <span className="text-small text-ink-muted">{t(label)}</span>
             </li>
           ))}
         </ol>
         {/* why jobs were dropped, for free, before any AI */}
-        <ul className="grid content-start gap-2" aria-label="Why jobs were filtered out">
+        <ul className="grid content-start gap-2" aria-label={t('Why jobs were filtered out')}>
           {funnel.filtered.map(([reason, value]) => (
-            <li key={reason} className="grid grid-cols-[minmax(0,10rem)_1fr_3rem] items-center gap-3 text-small" title={`${reason}: ${value} jobs`}>
-              <span className="truncate text-ink-muted">{reason}</span>
+            <li key={reason} className="grid grid-cols-[minmax(0,10rem)_1fr_3rem] items-center gap-3 text-small" title={t('{name}: {n} jobs', { name: t(reason), n: value })}>
+              <span className="truncate text-ink-muted">{t(reason)}</span>
               <span className="h-2 rounded-r-[4px] bg-score-low/70" style={{ width: `${Math.max(2, (value / most) * 100)}%` }} />
               <span className="text-right font-mono text-[0.75rem] text-ink tabular">{value}</span>
             </li>

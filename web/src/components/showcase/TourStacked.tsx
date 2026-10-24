@@ -4,6 +4,7 @@ import { SearchRun } from './sources'
 import { Station } from './Station'
 import { ControlPreview, FilterPreview, PackPreview, ScorePreview } from './StepPreviews'
 import { TOUR_STEPS } from './tourSteps'
+import { t } from '@/i18n'
 
 const PREVIEWS = [
   ({ play }: { play: boolean }) => <SearchRun play={play} className="-m-4 shadow-none sm:-m-5" />,
@@ -18,15 +19,15 @@ const PREVIEWS = [
 export function TourStacked() {
   return (
     <section id="how-it-works" aria-labelledby="how-title" className="mx-auto max-w-[1200px] px-4 pt-8 pb-24 sm:px-6">
-      <h2 id="how-title" className="font-wide text-display-m font-semibold lg:text-display-l">How it works</h2>
+      <h2 id="how-title" className="font-wide text-display-m font-semibold lg:text-display-l">{t('How it works')}</h2>
       <p className="mt-3 max-w-[52ch] text-body-l text-ink-muted">
-        Five steps, from job ads to an application you send yourself.
+        {t('Five steps, from job ads to an application you send yourself.')}
       </p>
       <ol className="mt-12">
         {TOUR_STEPS.map((step, i) => {
           const Preview = PREVIEWS[i]
           return (
-            <StackedStep key={step.id} last={i === TOUR_STEPS.length - 1} title={step.title} text={step.text}
+            <StackedStep key={step.id} last={i === TOUR_STEPS.length - 1} title={t(step.title)} text={t(step.text)}
               preview={(play) => <Preview play={play} />} />
           )
         })}

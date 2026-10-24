@@ -6,6 +6,7 @@ import { useToast } from '@/components/app/toast-context'
 import { Button } from '@/components/ui/button'
 import { useData, type Profile, type ProfileValue } from '@/lib/dataSource'
 import { inputClass } from './TopBarDialogs'
+import { t } from '@/i18n'
 
 // The cards of the page, in order. Each card saves its own sections of profile.yaml.
 const CARDS: { id: string; title: string; help: string; sections: string[] }[] = [
@@ -25,7 +26,7 @@ const LABELS: Record<string, string> = {
   taught_in: 'Taught in', focus_areas: 'Focus areas', thesis_grade: 'Thesis grade', dissertation_mark: 'Dissertation mark',
   product_and_business: 'Product and business', data_and_analytics: 'Data and analytics', ai_and_automation: 'AI and automation',
 }
-const label = (key: string) => LABELS[key] ?? key.charAt(0).toUpperCase() + key.slice(1).replaceAll('_', ' ')
+const label = (key: string) => t(LABELS[key] ?? key.charAt(0).toUpperCase() + key.slice(1).replaceAll('_', ' '))
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
 
 /** /app/profile: your master profile (profile.yaml), as forms. The app only saves what you type. */
@@ -46,7 +47,7 @@ export function ProfilePage() {
   const dirty = changes.length > 0
   useLeaveWarning(dirty)
 
-  if (failed) return <p className="px-8 py-24 text-ink-muted">Could not load profile.yaml. Is serve.py running?</p>
+  if (failed) return <p className="px-8 py-24 text-ink-muted">{t('Could not load profile.yaml. Is serve.py running?')}</p>
   if (!saved || !draft) return null
   const set = (section: string, value: ProfileValue) => setDraft({ ...draft, [section]: value })
 
@@ -67,7 +68,7 @@ export function ProfilePage() {
     setSaved(fresh)
     if (ok) {
       setDraft(fresh) // e.g. "2026" comes back as a number, so the form matches the file
-      toast(`Saved ${sections.length === 1 ? '1 section' : `${sections.length} sections`}. A backup of the old profile.yaml is in backup/profile/.`)
+      toast(sections.length === 1 ? t('Saved 1 section. A backup of the old profile.yaml is in backup/profile/.') : t('Saved {n} sections. A backup of the old profile.yaml is in backup/profile/.', { n: sections.length }))
       setReviewing(false)
     }
     setSaving(false)
@@ -76,15 +77,14 @@ export function ProfilePage() {
   return (
     <div className="mx-auto grid max-w-[1200px] gap-10 px-4 pt-6 pb-28 sm:px-8 sm:pt-8 xl:grid-cols-[minmax(0,1fr)_24rem]">
       <div className="min-w-0">
-        <h1 className="font-wide text-display-m font-semibold">My profile</h1>
+        <h1 className="font-wide text-display-m font-semibold">{t('My profile')}</h1>
         <p className="mt-1 max-w-[68ch] text-ink-muted">
-          Everything the AI knows about you: it scores jobs against it and writes your CVs only from it, so keep it true.
-          Nothing is saved until you review and confirm your changes; a backup of profile.yaml is made first.
+          {t('Everything the AI knows about you: it scores jobs against it and writes your CVs only from it, so keep it true. Nothing is saved until you review and confirm your changes; a backup of profile.yaml is made first.')}
         </p>
-        <nav aria-label="Profile sections" className="mt-6 flex flex-wrap gap-1">
+        <nav aria-label={t('Profile sections')} className="mt-6 flex flex-wrap gap-1">
           {CARDS.map((c) => (
             <a key={c.id} href={`#${c.id}`} className="rounded-sm px-2.5 py-1 text-small text-ink-muted transition-colors hover:bg-charcoal-800 hover:text-ink">
-              {c.title}
+              {t(c.title)}
             </a>
           ))}
         </nav>
@@ -106,30 +106,30 @@ export function ProfilePage() {
             role="status"
           >
             <span className="text-small">
-              <span className="font-mono tabular">{changes.length}</span> unsaved {changes.length === 1 ? 'change' : 'changes'}
+              <span className="font-mono tabular">{changes.length}</span> {changes.length === 1 ? t('unsaved change') : t('unsaved changes')}
             </span>
-            <Button variant="ghost" size="sm" onClick={() => setDraft(saved)}>Discard</Button>
-            <Button size="sm" onClick={() => setReviewing(true)}>Review and confirm</Button>
+            <Button variant="ghost" size="sm" onClick={() => setDraft(saved)}>{t('Discard')}</Button>
+            <Button size="sm" onClick={() => setReviewing(true)}>{t('Review and confirm')}</Button>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <Dialog open={reviewing} onClose={() => !saving && setReviewing(false)} title="Review your changes">
+      <Dialog open={reviewing} onClose={() => !saving && setReviewing(false)} title={t('Review your changes')}>
         <ul className="grid max-h-[55vh] gap-3 overflow-y-auto pr-1">
           {changes.map((c) => (
             <li key={c.path} className="rounded-md bg-charcoal-900/60 p-3 text-small shadow-depth-1">
               <p className="font-semibold">{c.path}</p>
-              {c.before !== null && <p className="mt-1.5 text-ink-muted"><span className="text-score-low">Before:</span> {c.before || '(empty)'}</p>}
-              {c.after !== null && <p className="mt-1 text-ink"><span className="text-go-400">After:</span> {c.after || '(empty)'}</p>}
+              {c.before !== null && <p className="mt-1.5 text-ink-muted"><span className="text-score-low">{t('Before:')}</span> {c.before || t('(empty)')}</p>}
+              {c.after !== null && <p className="mt-1 text-ink"><span className="text-go-400">{t('After:')}</span> {c.after || t('(empty)')}</p>}
             </li>
           ))}
         </ul>
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <Button onClick={confirm} disabled={saving}>
-            {saving ? <><Loader2 className="animate-spin" aria-hidden /> Saving</> : 'Confirm and save'}
+            {saving ? <><Loader2 className="animate-spin" aria-hidden /> {t('Saving')}</> : t('Confirm and save')}
           </Button>
-          <Button variant="secondary" onClick={() => setReviewing(false)} disabled={saving}>Keep editing</Button>
-          <Button variant="ghost" onClick={() => { setDraft(saved); setReviewing(false) }} disabled={saving}>Discard all</Button>
+          <Button variant="secondary" onClick={() => setReviewing(false)} disabled={saving}>{t('Keep editing')}</Button>
+          <Button variant="ghost" onClick={() => { setDraft(saved); setReviewing(false) }} disabled={saving}>{t('Discard all')}</Button>
         </div>
       </Dialog>
     </div>
@@ -145,7 +145,7 @@ function useLeaveWarning(dirty: boolean) {
     const onClick = (e: MouseEvent) => {
       const link = (e.target as HTMLElement).closest('a')
       if (!link || link.getAttribute('href')?.startsWith('#') || link.target === '_blank') return
-      if (!window.confirm('You have unsaved changes in My profile. Leave without saving?')) {
+      if (!window.confirm(t('You have unsaved changes in My profile. Leave without saving?'))) {
         e.preventDefault()
         e.stopPropagation()
       }
@@ -162,9 +162,9 @@ function useLeaveWarning(dirty: boolean) {
 /** Every value as "Section, Entry 1, Field" -> text, so two versions can be compared line by line */
 function flatten(value: ProfileValue, path: string, out: Map<string, string>) {
   if (Array.isArray(value) && value.some((v) => typeof v === 'object')) {
-    value.forEach((v, i) => flatten(v, `${path}, entry ${i + 1}`, out))
+    value.forEach((v, i) => flatten(v, `${path}, ${t('entry {n}', { n: i + 1 })}`, out))
   } else if (Array.isArray(value)) {
-    value.forEach((v, i) => out.set(`${path}, item ${i + 1}`, String(v)))
+    value.forEach((v, i) => out.set(`${path}, ${t('item {n}', { n: i + 1 })}`, String(v)))
   } else if (typeof value === 'object') {
     Object.entries(value).forEach(([k, v]) => flatten(v, `${path}, ${label(k)}`, out))
   } else {
@@ -200,14 +200,14 @@ function SectionCard({ card, saved, draft, onChange }: {
     <section id={card.id} aria-labelledby={`${card.id}-title`} className="scroll-mt-6 rounded-lg bg-charcoal-850 p-6 shadow-depth-2">
       <header>
         <h2 id={`${card.id}-title`} className="flex items-center gap-2.5 text-title font-semibold">
-          {card.title}
-          {changed && <span className="rounded-full bg-go-900 px-2 py-0.5 text-[0.75rem] font-medium text-go-400">Changed</span>}
+          {t(card.title)}
+          {changed && <span className="rounded-full bg-go-900 px-2 py-0.5 text-[0.75rem] font-medium text-go-400">{t('Changed')}</span>}
         </h2>
-        {card.help && <p className="mt-1 max-w-[60ch] text-small text-ink-muted">{card.help}</p>}
+        {card.help && <p className="mt-1 max-w-[60ch] text-small text-ink-muted">{t(card.help)}</p>}
       </header>
       <div className="mt-5 grid gap-5">
         {card.sections.filter((k) => k in draft).map((k) => (
-          <Value key={k} name={one ? card.title : label(k)} hideName={one} value={draft[k]} onChange={(v) => onChange(k, v)} />
+          <Value key={k} name={one ? t(card.title) : label(k)} hideName={one} value={draft[k]} onChange={(v) => onChange(k, v)} />
         ))}
       </div>
     </section>
@@ -275,7 +275,7 @@ function Words({ items, onChange }: { items: string[]; onChange: (v: ProfileValu
             <textarea className={`${inputClass} min-w-0 resize-y`} rows={2} value={item}
               onChange={(e) => onChange(items.map((x, j) => (j === i ? e.target.value : x)))} />
           ) : (
-            <input className={`${inputClass} min-w-0`} value={item} aria-label={`Item ${i + 1}`}
+            <input className={`${inputClass} min-w-0`} value={item} aria-label={t('Item {n}', { n: i + 1 })}
               onChange={(e) => onChange(items.map((x, j) => (j === i ? e.target.value : x)))} />
           )}
           <Tools index={i} count={items.length} onMove={(to) => onChange(move(items, i, to))}
@@ -283,7 +283,7 @@ function Words({ items, onChange }: { items: string[]; onChange: (v: ProfileValu
         </div>
       ))}
       <Button variant="ghost" size="sm" className="justify-self-start" onClick={() => onChange([...items, ''])}>
-        <Plus aria-hidden /> Add
+        <Plus aria-hidden /> {t('Add')}
       </Button>
     </div>
   )
@@ -299,11 +299,11 @@ function Entries({ items, onChange }: { items: ProfileValue[]; onChange: (v: Pro
     <div className="grid gap-4">
       {items.map((item, i) => {
         const fields = item as Record<string, ProfileValue>
-        const title = String(fields.role ?? fields.name ?? fields.degree ?? `Entry ${i + 1}`)
+        const title = String(fields.role ?? fields.name ?? fields.degree ?? t('Entry {n}', { n: i + 1 }))
         return (
           <details key={i} open={i === 0} className="group rounded-md bg-charcoal-900/60 shadow-depth-1">
             <summary className="flex cursor-pointer items-center gap-3 px-4 py-3">
-              <span className="min-w-0 flex-1 truncate font-semibold">{title || 'New entry'}</span>
+              <span className="min-w-0 flex-1 truncate font-semibold">{title || t('New entry')}</span>
               <span className="truncate text-small text-ink-muted">{String(fields.company ?? fields.school ?? fields.type ?? '')}</span>
               <Tools index={i} count={items.length} onMove={(to) => onChange(move(items, i, to))}
                 onRemove={() => onChange(items.filter((_, j) => j !== i))} />
@@ -318,7 +318,7 @@ function Entries({ items, onChange }: { items: ProfileValue[]; onChange: (v: Pro
         )
       })}
       <Button variant="ghost" size="sm" className="justify-self-start" onClick={() => onChange([...items, blank(items[0] ?? {})])}>
-        <Plus aria-hidden /> Add entry
+        <Plus aria-hidden /> {t('Add entry')}
       </Button>
     </div>
   )
@@ -329,9 +329,9 @@ function Tools({ index, count, onMove, onRemove }: { index: number; count: numbe
   const stop = (fn: () => void) => (e: React.MouseEvent) => { e.preventDefault(); e.stopPropagation(); fn() }
   return (
     <span className="flex shrink-0 gap-0.5">
-      <Button variant="ghost" size="icon-sm" aria-label="Move up" disabled={index === 0} onClick={stop(() => onMove(index - 1))}><ArrowUp /></Button>
-      <Button variant="ghost" size="icon-sm" aria-label="Move down" disabled={index === count - 1} onClick={stop(() => onMove(index + 1))}><ArrowDown /></Button>
-      <Button variant="ghost" size="icon-sm" aria-label="Remove" onClick={stop(onRemove)}><Trash2 /></Button>
+      <Button variant="ghost" size="icon-sm" aria-label={t('Move up')} disabled={index === 0} onClick={stop(() => onMove(index - 1))}><ArrowUp /></Button>
+      <Button variant="ghost" size="icon-sm" aria-label={t('Move down')} disabled={index === count - 1} onClick={stop(() => onMove(index + 1))}><ArrowDown /></Button>
+      <Button variant="ghost" size="icon-sm" aria-label={t('Remove')} onClick={stop(onRemove)}><Trash2 /></Button>
     </span>
   )
 }
@@ -347,8 +347,8 @@ function move<T>(list: T[], from: number, to: number): T[] {
 function CvPreview({ profile }: { profile: Profile }) {
   const contact = (profile.contact ?? {}) as Record<string, string>
   return (
-    <aside aria-label="CV preview" className="xl:sticky xl:top-8 xl:self-start">
-      <p className="mb-2 text-small text-ink-muted">CV preview, live</p>
+    <aside aria-label={t('CV preview')} className="xl:sticky xl:top-8 xl:self-start">
+      <p className="mb-2 text-small text-ink-muted">{t('CV preview, live')}</p>
       <div className="rounded-sm bg-[#f4f3ef] p-7 text-[#1d1d1b] shadow-depth-3">
         <p className="text-center font-wide text-[1.375rem] font-bold text-[#1f4e3a]">{String(profile.name ?? '')}</p>
         <p className="mt-1 text-center text-small">{String(profile.headline ?? '')}</p>
@@ -356,7 +356,7 @@ function CvPreview({ profile }: { profile: Profile }) {
           {[profile.location, contact.phone, contact.email, contact.linkedin, contact.portfolio].filter(Boolean).join('  |  ')}
         </p>
         <hr className="my-4 border-[#1d1d1b]/40" />
-        <p className="text-[0.75rem] font-bold text-[#1f4e3a]">Profile</p>
+        <p className="text-[0.75rem] font-bold text-[#1f4e3a]">{t('Profile')}</p>
         {/* the file wraps long lines by hand; on the CV they flow as one paragraph */}
         <p className="mt-1 text-[0.8125rem] leading-relaxed">{String(profile.summary ?? '').trim()}</p>
       </div>

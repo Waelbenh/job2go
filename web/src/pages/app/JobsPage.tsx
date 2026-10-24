@@ -9,6 +9,7 @@ import type { Job, JobTab } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { useSearch } from './search'
 import { JobPanel } from './JobPanel'
+import { t } from '@/i18n'
 
 const TABS: { tab: JobTab; label: string; empty: string }[] = [
   { tab: 'good', label: 'Good matches', empty: 'No good matches right now. Run a search to look for new jobs.' },
@@ -72,22 +73,22 @@ export function JobsPage() {
   }
   const open = (job: Job) => navigate({ pathname: `${base}/jobs/${job.n}`, search: params.toString() })
   const close = () => navigate({ pathname: `${base}/jobs`, search: params.toString() })
-  const current = TABS.find((t) => t.tab === tab) ?? TABS[0]
+  const current = TABS.find((x) => x.tab === tab) ?? TABS[0]
 
   return (
     <div className="mx-auto max-w-[1100px] px-4 py-6 sm:px-8 sm:py-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-wide text-display-m font-semibold">{query ? 'Search' : 'Jobs'}</h1>
+          <h1 className="font-wide text-display-m font-semibold">{query ? t('Search') : t('Jobs')}</h1>
           <p className="mt-1 text-ink-muted">
-            {query ? <>Results for “{query}” in every tab.</> : data ? <><span className="font-mono text-ink tabular">{data.stats.tracked}</span> jobs tracked. Updated {data.updated}.</> : 'Loading your jobs'}
+            {query ? <>{t('Results for “{q}” in every tab.', { q: query })}</> : data ? <><span className="font-mono text-ink tabular">{data.stats.tracked}</span> {t('jobs tracked. Updated {when}.', { when: data.updated })}</> : t('Loading your jobs')}
           </p>
         </div>
-        <div className="flex gap-1 rounded-md bg-charcoal-850 p-1 shadow-depth-1" role="group" aria-label="Where">
+        <div className="flex gap-1 rounded-md bg-charcoal-850 p-1 shadow-depth-1" role="group" aria-label={t('Where')}>
           {places.map((p) => (
             <button key={p} type="button" onClick={() => setParam('place', p)} aria-pressed={place === p}
               className={cn('rounded-sm px-3 py-1 text-small transition-colors', place === p ? 'bg-charcoal-700 text-ink' : 'text-ink-muted hover:text-ink')}>
-              {p}
+              {t(p)}
             </button>
           ))}
         </div>
@@ -95,37 +96,37 @@ export function JobsPage() {
 
       {/* More filters: lowest score, and where the job was found */}
       <div className="mt-4 flex flex-wrap items-center gap-3 text-small">
-        <label className="flex items-center gap-2 text-ink-muted">Score
+        <label className="flex items-center gap-2 text-ink-muted">{t('Score')}
           <select value={minScore} onChange={(e) => setParam('score', e.target.value === '0' ? '' : e.target.value)}
             className="rounded-sm bg-charcoal-850 px-2 py-1 text-ink shadow-depth-1 outline-none focus:shadow-glow-go">
-            <option value="0">Any</option>
-            {[9, 8, 7, 6, 5].map((s) => <option key={s} value={s}>{s} and up</option>)}
+            <option value="0">{t('Any')}</option>
+            {[9, 8, 7, 6, 5].map((s) => <option key={s} value={s}>{t('{n} and up', { n: s })}</option>)}
           </select>
         </label>
-        <label className="flex items-center gap-2 text-ink-muted">Found on
+        <label className="flex items-center gap-2 text-ink-muted">{t('Found on')}
           <select value={source} onChange={(e) => setParam('source', e.target.value)}
             className="rounded-sm bg-charcoal-850 px-2 py-1 text-ink shadow-depth-1 outline-none focus:shadow-glow-go">
-            <option value="">All sites</option>
-            {sources.map((s) => <option key={s} value={s}>{s}</option>)}
+            <option value="">{t('All sites')}</option>
+            {sources.map((s) => <option key={s} value={s}>{t(s)}</option>)}
           </select>
         </label>
         {filtered && (
           <button type="button" onClick={() => setParams(new URLSearchParams(tab ? { tab } : {}), { replace: true })}
             className="rounded-sm px-2 py-1 text-ink-muted transition-colors hover:bg-charcoal-800 hover:text-ink">
-            Clear filters
+            {t('Clear filters')}
           </button>
         )}
       </div>
 
       {!query && (
-        <nav aria-label="Job tabs" className="mt-6 flex flex-wrap gap-x-1 gap-y-2 border-b border-hairline">
-          {TABS.map(({ tab: t, label }) => (
-            <button key={t} type="button" onClick={() => setParam('tab', t)} aria-current={tab === t ? 'page' : undefined}
+        <nav aria-label={t('Job tabs')} className="mt-6 flex flex-wrap gap-x-1 gap-y-2 border-b border-hairline">
+          {TABS.map(({ tab: id, label }) => (
+            <button key={id} type="button" onClick={() => setParam('tab', id)} aria-current={tab === id ? 'page' : undefined}
               className={cn('relative flex items-center gap-2 px-3 pt-1 pb-3 transition-colors',
-                tab === t ? 'text-ink' : 'text-ink-muted hover:text-ink')}>
-              {label}
-              <span className="font-mono text-[0.75rem] tabular">{counts[t] ?? 0}</span>
-              {tab === t && (
+                tab === id ? 'text-ink' : 'text-ink-muted hover:text-ink')}>
+              {t(label)}
+              <span className="font-mono text-[0.75rem] tabular">{counts[id] ?? 0}</span>
+              {tab === id && (
                 <motion.span layoutId="tab-line" className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-go-500"
                   transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }} />
               )}
@@ -134,22 +135,21 @@ export function JobsPage() {
         </nav>
       )}
 
-      <section aria-label={current.label} className="@container mt-4">
+      <section aria-label={t(current.label)} className="@container mt-4">
         {tab === 'incomplete' && !query && (
           <p className="max-w-[68ch] px-4 pb-3 text-small text-ink-muted">
-            The job ad was missing or cut off and could not be downloaded. Open the job, copy its full text from the job
-            page and use Add description: the job is then scored.
+            {t('The job ad was missing or cut off and could not be downloaded. Open the job, copy its full text from the job page and use Add description: the job is then scored.')}
           </p>
         )}
         {data && shown.length === 0 && (
-          <p className="px-4 py-12 text-ink-muted">{query ? 'Nothing matches your search.' : filtered ? 'No jobs match these filters.' : current.empty}</p>
+          <p className="px-4 py-12 text-ink-muted">{query ? t('Nothing matches your search.') : filtered ? t('No jobs match these filters.') : t(current.empty)}</p>
         )}
         <ul className="grid">
           {shown.map((job, i) => (
             <li key={job.n} className={cn('group relative border-b border-hairline last:border-0', Number(n) === job.n && 'rounded-md bg-charcoal-850')}>
               <JobRow job={job} onOpen={open} animatedRing={i < 8} className="pr-12" />
               {!['applied', 'notint', 'rejected'].includes(job.tab) && (
-                <button type="button" onClick={() => dismiss(job)} aria-label={`Not interested in ${job.title}`} title="Not interested"
+                <button type="button" onClick={() => dismiss(job)} aria-label={t('Not interested in {title}', { title: job.title })} title={t('Not interested')}
                   className="absolute top-3 right-2 grid size-8 place-items-center rounded-md text-ink-faint opacity-60 transition-[opacity,background-color,color] group-hover:opacity-100 hover:bg-charcoal-800 hover:text-score-low focus-visible:opacity-100">
                   <X className="size-4" aria-hidden />
                 </button>

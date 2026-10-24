@@ -2,6 +2,7 @@ import type { Job } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { ScoreRing } from './ScoreRing'
 import { StatusPill, TagList } from './Tag'
+import { t } from '@/i18n'
 
 interface JobRowProps {
   job: Job
@@ -29,14 +30,14 @@ export function JobRow({ job, onOpen, animatedRing = true, className }: JobRowPr
       <div className="min-w-0">
         <h3 className="flex items-center gap-2 truncate font-semibold">
           {job.new && (
-            <span className="rounded-sm bg-go-500 px-1.5 py-px text-[0.6875rem] font-bold text-charcoal-950">New</span>
+            <span className="rounded-sm bg-go-500 px-1.5 py-px text-[0.6875rem] font-bold text-charcoal-950">{t('New')}</span>
           )}
           <span className="truncate">{job.title}</span>
         </h3>
         <p className="mt-0.5 flex flex-wrap gap-x-3 text-small text-ink-muted">
           <span className="text-ink">{job.company}</span>
-          <span>{job.location || 'Location not stated'}</span>
-          <span>via {job.source}</span>
+          <span>{job.location || t('Location not stated')}</span>
+          <span>{t('via {source}', { source: t(job.source) })}</span>
         </p>
       </div>
       <div className="col-start-2 flex flex-wrap items-center gap-2 @2xl:col-start-3 @2xl:justify-end">

@@ -1,6 +1,7 @@
 import { Check, Loader2 } from 'lucide-react'
 import type { Tag as TagData } from '@/lib/types'
 import { cn } from '@/lib/utils'
+import { t, tList } from '@/i18n'
 
 // green = good, red = risk, outline = a neutral fact, grey = the one merged "Unknown" tag
 const KIND = {
@@ -13,8 +14,8 @@ const KIND = {
 export function Tag({ tag }: { tag: TagData }) {
   const [text, kind, tooltip] = tag
   return (
-    <li title={tooltip} className={cn('rounded-sm px-2 py-0.5 text-small whitespace-nowrap', KIND[kind])}>
-      {text}
+    <li title={tooltip && tList(tooltip)} className={cn('rounded-sm px-2 py-0.5 text-small whitespace-nowrap', KIND[kind])}>
+      {t(text)}
     </li>
   )
 }
@@ -34,14 +35,14 @@ export function StatusPill({ status }: { status: string }) {
   if (status === 'making pack') {
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full bg-charcoal-800 px-2.5 py-1 text-small text-ink-muted">
-        <Loader2 className="size-3.5 animate-spin" aria-hidden /> Making pack
+        <Loader2 className="size-3.5 animate-spin" aria-hidden /> {t('Making pack')}
       </span>
     )
   }
   if (status === 'new') return null
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full bg-go-900 px-2.5 py-1 text-small font-medium text-go-400">
-      <Check className="size-3.5" aria-hidden /> {status.charAt(0).toUpperCase() + status.slice(1)}
+      <Check className="size-3.5" aria-hidden /> {t(status.charAt(0).toUpperCase() + status.slice(1))}
     </span>
   )
 }

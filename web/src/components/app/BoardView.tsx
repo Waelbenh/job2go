@@ -4,6 +4,7 @@ import { ScoreRing } from '@/components/job/ScoreRing'
 import type { Job } from '@/lib/types'
 import { scoreColor } from '@/lib/score'
 import { cn } from '@/lib/utils'
+import { locale, t } from '@/i18n'
 
 export interface BoardColumn {
   column: string
@@ -48,7 +49,7 @@ export function BoardView({ columns, highlight, compact = false, className, onMo
           <section
             key={column}
             data-board-column={column}
-            aria-label={`${column}, ${jobs.length} jobs`}
+            aria-label={t('{column}, {n} jobs', { column: t(column), n: jobs.length })}
             className={cn('flex flex-col gap-2 rounded-lg bg-charcoal-850/70 p-2.5 transition-[box-shadow,background-color] duration-200',
               onMove && 'min-h-40', over === column && 'bg-charcoal-850 shadow-glow-go')}
             onDragOver={onMove && status ? (e) => { e.preventDefault(); setOver(column) } : undefined}
@@ -62,7 +63,7 @@ export function BoardView({ columns, highlight, compact = false, className, onMo
             } : undefined}
           >
             <h3 className="flex items-center justify-between px-1.5 pt-1 text-small font-semibold">
-              {column}
+              {t(column)}
               <span className="font-mono text-[0.75rem] text-ink-muted tabular">{jobs.length}</span>
             </h3>
             {jobs.map((job) => (
@@ -84,7 +85,7 @@ export function BoardView({ columns, highlight, compact = false, className, onMo
                     draggable: true,
                     tabIndex: 0,
                     role: 'button',
-                    'aria-label': `${job.title}, ${job.company}. Arrow keys move it, Enter opens it.`,
+                    'aria-label': t('{title}, {company}. Arrow keys move it, Enter opens it.', { title: job.title, company: job.company }),
                     onDragStart: (e: React.DragEvent) => {
                       e.dataTransfer.setData('text/plain', String(job.n))
                       e.dataTransfer.effectAllowed = 'move'
@@ -108,7 +109,7 @@ export function BoardView({ columns, highlight, compact = false, className, onMo
                     <p className="truncate text-[0.75rem] text-ink-muted">{job.company}</p>
                     {job.applied_on && job.status !== 'pack ready' && (
                       <p className="mt-1 text-[0.75rem] text-ink-muted">
-                        Applied {shortDate(job.applied_on)}
+                        {t('Applied {date}', { date: shortDate(job.applied_on) })}
                       </p>
                     )}
                   </div>
@@ -125,5 +126,5 @@ export function BoardView({ columns, highlight, compact = false, className, onMo
 /** "2026-01-15" -> "15 Jan" */
 function shortDate(iso: string): string {
   const date = new Date(`${iso}T12:00:00`)
-  return Number.isNaN(date.getTime()) ? iso : date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+  return Number.isNaN(date.getTime()) ? iso : date.toLocaleDateString(locale(), { day: 'numeric', month: 'short' })
 }

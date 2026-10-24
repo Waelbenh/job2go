@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Logo } from '@/components/brand/Logo'
+import { LangSwitch } from '@/components/theme/LangSwitch'
 import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { t } from '@/i18n'
 
 const LINKS = [
   ['How it works', 'how-it-works'],
@@ -41,8 +43,8 @@ export function ShowcaseNav() {
   const active = useActiveSection()
   return (
     <div className="sticky top-3 z-50 px-3 sm:top-4 sm:px-6">
-      <nav aria-label="Main" className="glass mx-auto flex h-14 max-w-[1200px] items-center gap-6 rounded-lg pr-2 pl-4">
-        <a href="#top" aria-label="Job2go AI, back to the top" className="rounded-md">
+      <nav aria-label={t('Main')} className="glass mx-auto flex h-14 max-w-[1200px] items-center gap-6 rounded-lg pr-2 pl-4">
+        <a href="#top" aria-label={t('Job2go AI, back to the top')} className="rounded-md">
           <Logo />
         </a>
         <ul className="ml-auto hidden items-center gap-1 md:flex">
@@ -56,7 +58,7 @@ export function ShowcaseNav() {
                   active === id ? 'text-ink' : 'text-ink-muted',
                 )}
               >
-                {label}
+                {t(label)}
                 {/* a small green line under the section you are in */}
                 <span
                   aria-hidden
@@ -69,9 +71,10 @@ export function ShowcaseNav() {
             </li>
           ))}
         </ul>
-        <ThemeToggle className="ml-auto md:ml-0" />
+        <LangSwitch className="ml-auto md:ml-0" />
+        <ThemeToggle className="-ml-4" />
         <Button asChild size="sm" className="-ml-4">
-          <a href="/demo">Try the demo</a>
+          <a href="/demo">{t('Try the demo')}</a>
         </Button>
       </nav>
     </div>

@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { JobRow } from '@/components/job/JobRow'
 import type { Job, Stats } from '@/lib/types'
 import { BestMatch } from './BestMatch'
+import { t } from '@/i18n'
 
 interface DashboardViewProps {
   stats: Stats
@@ -33,10 +34,10 @@ export function DashboardView({
     <div className="@container">
       <div className="grid gap-8 p-6 @3xl:p-8">
         <header>
-          <h1 className="font-wide text-display-m font-semibold">Today</h1>
+          <h1 className="font-wide text-display-m font-semibold">{t('Today')}</h1>
           <p className="mt-1 text-ink-muted">
-            <Num>{stats.new_today}</Num> new jobs since the last run, <Num>{stats.good}</Num> good matches,{' '}
-            <Num>{stats.applied}</Num> applications sent.
+            <Num>{stats.new_today}</Num> {t('new jobs since the last run,')} <Num>{stats.good}</Num> {t('good matches,')}{' '}
+            <Num>{stats.applied}</Num> {t('applications sent.')}
           </p>
         </header>
 
@@ -44,7 +45,7 @@ export function DashboardView({
           onOpen={onOpenJob && (() => onOpenJob(best))} onMakePack={onMakePack && (() => onMakePack(best))} />
 
         <section aria-labelledby="new-today" data-tour="list">
-          <h2 id="new-today" className="mb-2 px-4 text-title font-semibold">New today</h2>
+          <h2 id="new-today" className="mb-2 px-4 text-title font-semibold">{t('New today')}</h2>
           {beforeList}
           <motion.ul layout={!reduceMotion} className="grid">
             <AnimatePresence initial={false}>

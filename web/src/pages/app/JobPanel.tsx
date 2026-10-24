@@ -10,6 +10,8 @@ import { useData, useJobs } from '@/lib/dataSource'
 import type { ActionResult, Job } from '@/lib/types'
 import { LearningGuide, PackQuality, RemakePack } from './PackExtras'
 import { inputClass } from './TopBarDialogs'
+import { t } from '@/i18n'
+import { localDescription } from '@/i18n/jobText'
 
 const APPLIED = ['applied', 'interview', 'offer']
 
@@ -37,7 +39,7 @@ export function JobPanel({ number, onClose }: { number: number | null; onClose: 
           />
           <motion.aside
             key="panel"
-            aria-label="Job details"
+            aria-label={t('Job details')}
             className="fixed top-0 right-0 bottom-0 z-50 w-[min(40rem,100vw)] overflow-y-auto border-l border-hairline bg-charcoal-900 shadow-depth-3"
             initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
             transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
@@ -77,7 +79,7 @@ function PanelContent({ number, onClose }: { number: number; onClose: () => void
     setBusy(null)
     // a new pack may list tools the job asks for that are not on your CV
     const tools = Array.isArray(result.tool_to_learn) ? (result.tool_to_learn as string[]) : []
-    toast(result.message + (result.ok && tools.length ? `. Tools to learn (not on your CV): ${tools.join(', ')}` : ''), result.ok)
+    toast(result.message + (result.ok && tools.length ? t('. Tools to learn (not on your CV): {tools}', { tools: tools.join(', ') }) : ''), result.ok)
     if (name === 'description') setReplacing(false)
     await Promise.all([reload(), load()])
   }
@@ -86,14 +88,14 @@ function PanelContent({ number, onClose }: { number: number; onClose: () => void
     return (
       <div className="p-8">
         <CloseButton onClose={onClose} />
-        <p className="mt-10 text-ink-muted">There is no job number {number}.</p>
+        <p className="mt-10 text-ink-muted">{t('There is no job number {n}.', { n: number })}</p>
       </div>
     )
   }
   if (!job) {
     return (
       <div className="flex items-center gap-3 p-8 text-ink-muted">
-        <Loader2 className="size-4 animate-spin" aria-hidden /> Loading job {number}
+        <Loader2 className="size-4 animate-spin" aria-hidden /> {t('Loading job {n}', { n: number })}
       </div>
     )
   }
@@ -109,7 +111,7 @@ function PanelContent({ number, onClose }: { number: number; onClose: () => void
       <header className="grid gap-5">
         <div className="flex items-start justify-between gap-4">
           <p className="text-small text-ink-muted">
-            Job <span className="font-mono tabular">{job.n}</span>, found{' '}
+            {t('Job')} <span className="font-mono tabular">{job.n}</span>, {t('found')}{' '}
             <span className="font-mono tabular">{job.found_on}</span>
           </p>
           <CloseButton onClose={onClose} />
@@ -120,8 +122,8 @@ function PanelContent({ number, onClose }: { number: number; onClose: () => void
             <h2 className="font-wide text-title font-semibold sm:text-[1.5rem] sm:leading-tight">{job.title}</h2>
             <p className="mt-1.5 flex flex-wrap gap-x-4 text-ink-muted">
               <span className="text-ink">{job.company}</span>
-              <span>{job.location || 'Location not stated'}</span>
-              <span>via {job.source}</span>
+              <span>{job.location || t('Location not stated')}</span>
+              <span>{t('via {source}', { source: t(job.source) })}</span>
             </p>
             {job.status !== 'new' && <div className="mt-3"><StatusPill status={job.status} /></div>}
           </div>
@@ -130,7 +132,7 @@ function PanelContent({ number, onClose }: { number: number; onClose: () => void
       </header>
 
       {/* ---- Buttons: the main one depends on where the job is ---- */}
-      <section aria-label="Actions" className="flex flex-wrap gap-3">
+      <section aria-label={t('Actions')} className="flex flex-wrap gap-3">
         {hasPack ? (
           <>
             <PackLinks job={job} />
@@ -138,37 +140,37 @@ function PanelContent({ number, onClose }: { number: number; onClose: () => void
           </>
         ) : job.short ? null : (
           <Button size="lg" disabled={working} onClick={() => act('pack', () => api.makePack(job.n))}>
-            {busy === 'pack' ? <><Loader2 className="animate-spin" aria-hidden /> Making application pack</> : 'Make application pack'}
+            {busy === 'pack' ? <><Loader2 className="animate-spin" aria-hidden /> {t('Making application pack')}</> : t('Make application pack')}
           </Button>
         )}
         {applied ? (
           <Button variant="secondary" size="lg" disabled={working} onClick={() => act('applied', () => api.undoApplied(job.n))}>
-            Undo applied
+            {t('Undo applied')}
           </Button>
         ) : (
           <Button variant="secondary" size="lg" disabled={working} onClick={() => act('applied', () => api.markApplied(job.n))}>
-            Mark as applied
+            {t('Mark as applied')}
           </Button>
         )}
         {notInterested ? (
           <Button variant="ghost" size="lg" disabled={working} onClick={() => act('notint', () => api.undoNotInterested(job.n))}>
-            Undo not interested
+            {t('Undo not interested')}
           </Button>
         ) : !applied && (
           <Button variant="ghost" size="lg" disabled={working} onClick={() => act('notint', () => api.notInterested(job.n))}>
-            Not interested
+            {t('Not interested')}
           </Button>
         )}
         {job.url && (
           <Button variant="ghost" size="lg" asChild>
-            <a href={job.url} target="_blank" rel="noreferrer">Open job ad <ExternalLink aria-hidden /></a>
+            <a href={job.url} target="_blank" rel="noreferrer">{t('Open job ad')} <ExternalLink aria-hidden /></a>
           </Button>
         )}
       </section>
       {hasPack && <div className="-mt-4"><PackQuality job={job} /></div>}
       {busy === 'pack' && (
         <p className="-mt-4 text-small text-ink-muted">
-          The AI is writing your CV, letter and interview prep. This takes a few minutes; you can keep this panel open.
+          {t('The AI is writing your CV, letter and interview prep. This takes a few minutes; you can keep this panel open.')}
         </p>
       )}
 
@@ -181,11 +183,11 @@ function PanelContent({ number, onClose }: { number: number; onClose: () => void
       {/* ---- Why this score ---- */}
       {job.score > 0 && (
         <section aria-labelledby="why" className="grid gap-4">
-          <h3 id="why" className="text-title font-semibold">Why this score</h3>
-          {job.summary && <p className="max-w-[68ch] text-ink-muted">{job.summary}</p>}
+          <h3 id="why" className="text-title font-semibold">{t('Why this score')}</h3>
+          {job.summary && <p className="max-w-[68ch] text-ink-muted">{t(job.summary)}</p>}
           <p className="text-small text-ink-muted">
-            AI fit <span className="font-mono text-ink tabular">{job.fit || '–'}</span>
-            {job.adjustments && <>, then the rules: <span className="text-ink">{job.adjustments}</span></>}
+            {t('AI fit')} <span className="font-mono text-ink tabular">{job.fit || '–'}</span>
+            {job.adjustments && <>, {t('then the rules:')} <span className="text-ink">{t(job.adjustments)}</span></>}
           </p>
           <ScoreBreakdown job={job} />
         </section>
@@ -196,26 +198,26 @@ function PanelContent({ number, onClose }: { number: number; onClose: () => void
 
       {/* ---- Facts ---- */}
       <section aria-labelledby="facts">
-        <h3 id="facts" className="text-title font-semibold">Details</h3>
+        <h3 id="facts" className="text-title font-semibold">{t('Details')}</h3>
         <dl className="mt-3 grid grid-cols-[9rem_1fr] gap-x-4 gap-y-2.5 text-small">
-          <Fact label="Trust">{[job.trust, job.trust_reason].filter(Boolean).join(': ')}</Fact>
-          <Fact label="Languages">{[job.language, job.languages_preferred && `a plus: ${job.languages_preferred}`].filter(Boolean).join(', ')}</Fact>
-          <Fact label="Contact">{job.contact}</Fact>
-          <Fact label="Tools to learn">{job.tool_to_learn}</Fact>
-          <Fact label="Applied on">{job.applied_on}</Fact>
-          <Fact label="Scored">{[job.model, job.scored_on].filter(Boolean).join(', ')}</Fact>
-          <Fact label="Pack">{[job.pack_model, job.quality && `quality ${job.quality}/10`].filter(Boolean).join(', ')}</Fact>
+          <Fact label={t('Trust')}>{[t(job.trust), job.trust_reason].filter(Boolean).join(': ')}</Fact>
+          <Fact label={t('Languages')}>{[job.language, job.languages_preferred && t('a plus: {langs}', { langs: job.languages_preferred })].filter(Boolean).join(', ')}</Fact>
+          <Fact label={t('Contact')}>{job.contact}</Fact>
+          <Fact label={t('Tools to learn')}>{job.tool_to_learn}</Fact>
+          <Fact label={t('Applied on')}>{job.applied_on}</Fact>
+          <Fact label={t('Scored')}>{[job.model, job.scored_on].filter(Boolean).join(', ')}</Fact>
+          <Fact label={t('Pack')}>{[job.pack_model && t(job.pack_model), job.quality && t('quality {q}/10', { q: job.quality })].filter(Boolean).join(', ')}</Fact>
         </dl>
       </section>
 
       {/* ---- The job ad itself ---- */}
       {job.description && (
         <details className="group rounded-lg bg-charcoal-850 p-5 shadow-depth-1">
-          <summary className="cursor-pointer text-title font-semibold marker:text-ink-faint">The job ad</summary>
+          <summary className="cursor-pointer text-title font-semibold marker:text-ink-faint">{t('The job ad')}</summary>
           {!job.short && !replacing && (
-            <Button variant="ghost" size="sm" className="mt-3" onClick={() => setReplacing(true)}>Paste a newer job ad</Button>
+            <Button variant="ghost" size="sm" className="mt-3" onClick={() => setReplacing(true)}>{t('Paste a newer job ad')}</Button>
           )}
-          <p className="mt-4 max-w-[68ch] whitespace-pre-line text-ink-muted">{job.description}</p>
+          <p className="mt-4 max-w-[68ch] whitespace-pre-line text-ink-muted">{localDescription(job)}</p>
         </details>
       )}
     </div>
@@ -224,7 +226,7 @@ function PanelContent({ number, onClose }: { number: number; onClose: () => void
 
 function CloseButton({ onClose }: { onClose: () => void }) {
   return (
-    <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Close the panel" className="shrink-0">
+    <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label={t('Close the panel')} className="shrink-0">
       <X />
     </Button>
   )
@@ -254,7 +256,7 @@ function PackLinks({ job }: { job: Job }) {
     <>
       {DOCS.filter(({ key }) => job.files[key]).map(({ key, label, icon: Icon }, i) => (
         <Button key={key} size="lg" variant={i === 0 ? 'default' : 'secondary'} asChild>
-          <a href={fileUrl(job.files[key]!)} target="_blank" rel="noreferrer"><Icon aria-hidden /> {label}</a>
+          <a href={fileUrl(job.files[key]!)} target="_blank" rel="noreferrer"><Icon aria-hidden /> {t(label)}</a>
         </Button>
       ))}
     </>
@@ -267,17 +269,17 @@ function AddDescription({ job, busy, onSave, replacing = false }: { job: Job; bu
   const enough = length >= 300
   return (
     <section aria-labelledby="add-description" className="grid gap-3 rounded-lg bg-charcoal-850 p-5 shadow-depth-1">
-      <h3 id="add-description" className="text-title font-semibold">{replacing ? 'Paste a newer job ad' : 'The job ad is missing or cut off'}</h3>
+      <h3 id="add-description" className="text-title font-semibold">{replacing ? t('Paste a newer job ad') : t('The job ad is missing or cut off')}</h3>
       <p className="text-small text-ink-muted">
-        Paste the full text from the job page, then it is scored. The application pack needs it too.
-        {job.url && <> <a href={job.url} target="_blank" rel="noreferrer" className="text-score-good underline-offset-4 hover:underline">Open the job page</a>.</>}
+        {t('Paste the full text from the job page, then it is scored. The application pack needs it too.')}
+        {job.url && <> <a href={job.url} target="_blank" rel="noreferrer" className="text-score-good underline-offset-4 hover:underline">{t('Open the job page')}</a>.</>}
       </p>
       <textarea className={`${inputClass} min-h-36 resize-y`} value={text} onChange={(e) => setText(e.target.value)}
-        aria-label="Job description" placeholder="Paste the whole job ad here" />
+        aria-label={t('Job description')} placeholder={t('Paste the whole job ad here')} />
       <div className="flex flex-wrap items-center gap-3">
-        <Button disabled={!enough || busy} onClick={() => onSave(text)}>Save and score</Button>
+        <Button disabled={!enough || busy} onClick={() => onSave(text)}>{t('Save and score')}</Button>
         <span className={enough ? 'text-small text-go-400' : 'text-small text-ink-muted'}>
-          <span className="font-mono tabular">{length}</span> of at least <span className="font-mono tabular">300</span> characters
+          <span className="font-mono tabular">{length}</span> {t('of at least')} <span className="font-mono tabular">300</span> {t('characters')}
         </span>
       </div>
     </section>

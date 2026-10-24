@@ -22,6 +22,7 @@ import { SearchRun } from './sources'
 import { Station } from './Station'
 import { TOUR_STEPS } from './tourSteps'
 import { useHeroScene } from './useHeroScene'
+import { t } from '@/i18n'
 
 // ---------------------------------------------------------------------------------------------
 // The scroll story (wide screens, motion allowed). One tall section; inside it a "stage" that
@@ -224,7 +225,7 @@ export function PinnedStory() {
   const spotlight = { x: spotX, y: spotY, width: spotW, height: spotH, opacity: shown }
 
   return (
-    <section ref={section} aria-label="Job2go AI, and how it works" className="relative" style={{ height: `${(DIST + 1) * 100}vh` }}>
+    <section ref={section} aria-label={t('Job2go AI, and how it works')} className="relative" style={{ height: `${(DIST + 1) * 100}vh` }}>
       {/* "See how it works" jumps here: the start of the steps */}
       <div id="how-it-works" aria-hidden className="absolute left-0" style={{ top: `${(GROW + 0.15) * 100}vh` }} />
       <div ref={stage} className="sticky top-0 h-screen overflow-hidden [perspective:2400px]">
@@ -313,7 +314,7 @@ function TourCanvas({ step, spotlight, sidebarShift, fade, windowRef }: {
       </motion.div>
       <div className="@container relative flex min-w-0 flex-1 flex-col overflow-hidden">
         <AppTopBar
-          running={step === 0 ? { label: searchDone ? `${sampleStats.new_today} new jobs found` : 'Searching 7 job sites', progress: searchProgress } : undefined}
+          running={step === 0 ? { label: searchDone ? t('{n} new jobs found', { n: sampleStats.new_today }) : t('Searching 7 job sites'), progress: searchProgress } : undefined}
         />
         <div className="relative min-h-0 flex-1 overflow-hidden">
           <motion.div
@@ -325,8 +326,8 @@ function TourCanvas({ step, spotlight, sidebarShift, fade, windowRef }: {
             <AnimatePresence mode="wait" initial={false}>
               {step === 4 ? (
                 <motion.div key="board" {...CROSSFADE} className="px-8 pt-6">
-                  <h1 className="font-wide text-display-m font-semibold">Board</h1>
-                  <p className="mt-1 text-ink-muted">Move a job when its status changes. Nothing is ever sent for you.</p>
+                  <h1 className="font-wide text-display-m font-semibold">{t('Board')}</h1>
+                  <p className="mt-1 text-ink-muted">{t('Move a job when its status changes. Nothing is ever sent for you.')}</p>
                   <BoardView columns={demoBoard(moved)} highlight={moved ? MOVING_JOB : undefined} className="mt-5" />
                 </motion.div>
               ) : (
@@ -412,14 +413,14 @@ function ScorePanel() {
   const job = sampleBestMatch
   return (
     <>
-      <p className="text-small text-ink-muted">Job details</p>
+      <p className="text-small text-ink-muted">{t('Job details')}</p>
       <div className="mt-4 flex items-center gap-6">
         <ScoreRing score={job.score} size="lg" />
         <div className="min-w-0">
           <h2 className="font-wide text-title font-semibold">{job.title}</h2>
           <p className="mt-1 text-ink-muted">{job.company}</p>
           <p className="mt-3 text-small text-ink-muted">
-            AI fit <span className="font-mono text-ink tabular">{job.fit}</span>, rules{' '}
+            {t('AI fit')} <span className="font-mono text-ink tabular">{job.fit}</span>, {t('rules')}{' '}
             <span className="font-mono text-ink tabular">{job.adjustments.split(' ')[0]}</span>
           </p>
         </div>
@@ -438,7 +439,7 @@ function PackPanel() {
   const docs = [useAfter(true, 1700), useAfter(true, 2000), useAfter(true, 2300)].filter(Boolean).length
   return (
     <>
-      <p className="text-small text-ink-muted">Application pack</p>
+      <p className="text-small text-ink-muted">{t('Application pack')}</p>
       <h2 className="mt-1 font-wide text-title font-semibold">{job.title}</h2>
       <p className="text-ink-muted">{job.company}</p>
       <ul className="mt-5 grid grid-cols-2 gap-x-4 gap-y-2">
@@ -448,14 +449,14 @@ function PackPanel() {
               done[i] ? 'bg-go-500 text-charcoal-950' : 'bg-charcoal-800')}>
               {done[i] && <Check className="size-3" strokeWidth={3} aria-hidden />}
             </span>
-            {label}
+            {t(label)}
           </li>
         ))}
       </ul>
       <PackDocs show={docs} className="mt-6 gap-4" />
       <div className="mt-6 flex gap-3">
-        <Button>Open CV</Button>
-        <Button variant="secondary">Download all</Button>
+        <Button>{t('Open CV')}</Button>
+        <Button variant="secondary">{t('Download all')}</Button>
       </div>
     </>
   )
@@ -489,11 +490,11 @@ function StepCard({ step, x, y, shown, lineFill, ref }: {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.35, ease: 'easeOut' }}
       >
-        <h2 className="mt-4 font-wide text-title font-semibold">{current.title}</h2>
-        <p className="mt-1.5 text-ink-muted">{current.text}</p>
+        <h2 className="mt-4 font-wide text-title font-semibold">{t(current.title)}</h2>
+        <p className="mt-1.5 text-ink-muted">{t(current.text)}</p>
         {step === STEPS - 1 && (
           <Button asChild className="mt-4">
-            <a href="/demo">Try the demo</a>
+            <a href="/demo">{t('Try the demo')}</a>
           </Button>
         )}
       </motion.div>
@@ -514,7 +515,7 @@ function PipelineLine({ step, fill }: { step: number; fill: MotionValue<number> 
         {TOUR_STEPS.map((s, i) => <Station key={s.id} small lit={i <= step} />)}
       </div>
       <p className="text-small text-ink-muted">
-        Step <span className="font-mono text-ink tabular">{Math.max(1, step + 1)}</span> of{' '}
+        {t('Step')} <span className="font-mono text-ink tabular">{Math.max(1, step + 1)}</span> {t('of')}{' '}
         <span className="font-mono tabular">{STEPS}</span>
       </p>
     </div>
