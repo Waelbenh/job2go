@@ -3,7 +3,8 @@ import { Link } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { useEntrance } from './entrance'
 import { HeroPreview } from './HeroPreview'
-import { t } from '@/i18n'
+import { getLang, t } from '@/i18n'
+import { cn } from '@/lib/utils'
 
 /** The headline, intro, buttons and note. Used by the normal hero and by the pinned scroll story. */
 export function HeroText({ item }: { item: Variants }) {
@@ -13,7 +14,9 @@ export function HeroText({ item }: { item: Variants }) {
         <span className="block text-[clamp(1.5rem,2.4vw,2.125rem)] leading-tight font-medium text-ink-muted">
           {t('Your AI job assistant,')}
         </span>
-        <span className="mt-1 block text-[clamp(3rem,5.6vw,4.375rem)] leading-[0.95] font-bold tracking-[-0.02em] whitespace-nowrap">
+        <span className={cn('mt-1 block leading-[0.95] font-bold tracking-[-0.02em]',
+          // English fits on one line; the longer French and Spanish lines may wrap, a bit smaller
+          getLang() === 'en' ? 'text-[clamp(3rem,5.6vw,4.375rem)] whitespace-nowrap' : 'text-[clamp(2.5rem,4.4vw,3.75rem)] text-balance')}>
           {t('ready to go.')}
         </span>
       </motion.h1>

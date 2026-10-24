@@ -15,7 +15,7 @@ export function DemoApp() {
 function DemoBanner() {
   return (
     <div className="flex h-10 items-center justify-center gap-3 border-b sm:gap-4 border-hairline bg-go-900 px-4 text-small text-go-400">
-      <span className="truncate">{t('Demo with sample data')}<span className="hidden sm:inline">. {t('Job2go runs on your own computer.')}</span></span>
+      <span className="shrink-0 sm:shrink sm:truncate"><span className="sm:hidden">Demo</span><span className="hidden sm:inline">{t('Demo with sample data')}. {t('Job2go runs on your own computer.')}</span></span>
       <Link to="/" className="shrink-0 text-ink underline-offset-4 hover:underline"><span className="sm:hidden">{t('Showcase')}</span><span className="hidden sm:inline">{t('Back to the showcase')}</span></Link>
       <button
         type="button"

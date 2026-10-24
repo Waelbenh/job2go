@@ -43,7 +43,7 @@ export function Features() {
       <p className="mt-3 max-w-[52ch] text-body-l text-ink-muted">
         {t('Everything a job search needs, from the first ad to the interview, in one calm place.')}
       </p>
-      <div className="mt-12 grid items-start gap-5 lg:grid-cols-12">
+      <div className="mt-12 grid grid-cols-[minmax(0,1fr)] items-start gap-5 lg:grid-cols-12">
         {FEATURES.map(({ title, text, Visual, span }) => (
           <FeatureCard key={title} title={t(title)} text={t(text)} className={span} visual={(play) => <Visual play={play} />} />
         ))}
@@ -62,13 +62,13 @@ function FeatureCard({ title, text, visual, className }: {
   const ref = useRef<HTMLElement>(null)
   const inView = useInView(ref, { once: true, amount: 0.4 })
   return (
-    <article ref={ref} className={cn('@container flex flex-col gap-6 rounded-xl bg-charcoal-850 p-6 shadow-depth-2 sm:p-7', className)}>
+    <article ref={ref} className={cn('@container flex min-w-0 flex-col gap-6 rounded-xl bg-charcoal-850 p-6 shadow-depth-2 sm:p-7', className)}>
       <div>
         <h3 className="font-wide text-title font-semibold">{title}</h3>
         <p className="mt-2 max-w-[52ch] text-ink-muted">{text}</p>
       </div>
       {/* a live crop of the app: it is a picture, so it can't be clicked or tabbed into */}
-      <div inert className="rounded-lg bg-charcoal-900/70 p-4 shadow-depth-1">{visual(inView)}</div>
+      <div inert className="min-w-0 rounded-lg bg-charcoal-900/70 p-4 shadow-depth-1">{visual(inView)}</div>
     </article>
   )
 }
@@ -83,8 +83,8 @@ function LearnPreview({ play }: { play: boolean }) {
     { icon: FileText, where: 'Official docs', what: 'Getting started with the CRM', cost: 'Free trial' },
   ]
   return (
-    <div className="grid gap-3">
-      <ul className="grid gap-2">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-3">
+      <ul className="grid grid-cols-[minmax(0,1fr)] gap-2">
         {rows.map(({ icon: Icon, where, what, cost }, i) => (
           <motion.li
             key={what}

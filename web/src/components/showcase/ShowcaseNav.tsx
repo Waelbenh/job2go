@@ -43,7 +43,7 @@ export function ShowcaseNav() {
   const active = useActiveSection()
   return (
     <div className="sticky top-3 z-50 px-3 sm:top-4 sm:px-6">
-      <nav aria-label={t('Main')} className="glass mx-auto flex h-14 max-w-[1200px] items-center gap-6 rounded-lg pr-2 pl-4">
+      <nav aria-label={t('Main')} className="glass mx-auto flex h-14 max-w-[1200px] items-center gap-2 rounded-lg pr-2 pl-4 sm:gap-6">
         <a href="#top" aria-label={t('Job2go AI, back to the top')} className="rounded-md">
           <Logo />
         </a>
@@ -72,9 +72,9 @@ export function ShowcaseNav() {
           ))}
         </ul>
         <LangSwitch className="ml-auto md:ml-0" />
-        <ThemeToggle className="-ml-4" />
-        <Button asChild size="sm" className="-ml-4">
-          <a href="/demo">{t('Try the demo')}</a>
+        <ThemeToggle className="sm:-ml-4" />
+        <Button asChild size="sm" className="shrink-0 sm:-ml-4">
+          <a href="/demo"><span className="sm:hidden">Demo</span><span className="hidden sm:inline">{t('Try the demo')}</span></a>
         </Button>
       </nav>
     </div>
